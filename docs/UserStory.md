@@ -22,23 +22,32 @@ Valentina wants to change the architecture of the network used to predict music 
 
 ## Return most similar genres
 Name: ReturnSimilarGenres
+
 What it does: Returns up to top 10 most similar genres to the input genre.
+
 Inputs: genre: string specifying genre to compare to
 	number_similar: integer between 1 and 10 specifying how many ranked similar genres to return
+
 Outputs: similar_genres: List of strings containing ranked list of most similar genres 
 
 ## Play song
 Name: PlaySong
+
 What it does: Plays a specified song. 
+
 Inputs: mp3, wav, etc file?
 	song name? 
+
 Outputs: the librosa song listening thing 
 
 ## Predict genre
 Name: PredictGenre
+
 What it does: Predicts the genre of a given song.  If the input is a sound file, returns the prediction for that file.  If the input is a song song name, checks to see if the song is already in the database.  If not, tells you to upload a sound file.  
+
 Inputs: mp3, wav, etc file?
 	song name: string
+
 Outputs: Plot displaying probabilities of genres. String specifying most likely genre. 
 
 
