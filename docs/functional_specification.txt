@@ -1,0 +1,10 @@
+Background: We want users to learn more about the music they like.  Given a music file, we will predict the genre of the song.  We will also return the most popular songs in that genre and other similar genres the user may be interested in. 
+
+User profile: The system can be used by anybody who wants to learn more about the songs they're listening to. Users don't need any domain specific information.
+
+Data sources: The data will come from "FMA: A Dataset for Music Analysis."  This dataset contains four files: "tracks.csv" containing track metadata, "genres.csv" containing genre information, "features.csv" containing audio features, and "echonest.csv" containing audio features provided by Echonest.  There are also various sizes of MPR-encoded audio data.
+
+Use cases: 1) a) A user has an audio file.  They want to know the genre of the music clip.  b) The user will ask the system to predict the genre of the file.
+	   2) a) A user has an audio file.  They want to know genres that are similar to that of their file.  b) The user will ask the system what genre their song is.  Then the system will return the most popular songs in the genre as well as similar genres.
+
+   
