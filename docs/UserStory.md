@@ -18,6 +18,10 @@ Display "Do you want to know the most popular songs in the genre?"
 
 Valentina wants to change the architecture of the network used to predict music genre and/or add data to the training set.  Valentina is a data scientist and highly technical.  
 
+## User 3
+
+User wants to use our service.  Has a bunch of files.  Doesn't want to deal with a NN. 
+
 # Components
 
 ## Return most similar genres
@@ -49,6 +53,14 @@ Inputs: mp3, wav, etc file?
 	song name: string
 
 Outputs: Plot displaying probabilities of genres. String specifying most likely genre. 
+
+## Train Network, validate, etc.
+
+## Preprocessing from audio to tensor
+
+## Load Best Model Parameters
+
+## Test our network for accuracy on the test set
 
 
 
