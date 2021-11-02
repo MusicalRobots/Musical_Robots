@@ -24,43 +24,69 @@ User wants to use our service.  Has a bunch of files.  Doesn't want to deal with
 
 # Components
 
-## Return most similar genres
+## Use case: return most similar genres
 Name: ReturnSimilarGenres
 
-What it does: Returns up to top 10 most similar genres to the input genre.
+What it does: Returns up to top 10 most similar genres to the input genre ranked by decreasing similarity.
 
-Inputs: genre: string specifying genre to compare to
-	number_similar: integer between 1 and 10 specifying how many ranked similar genres to return
+Inputs: genre: _string_ specifying genre to compare to
+	number_similar: _integer_ between 1 and 10 specifying how many ranked similar genres to return
 
-Outputs: similar_genres: List of strings containing ranked list of most similar genres 
+Outputs: similar_genres: _List of strings_ containing ranked list of most similar genres 
 
-## Play song
-Name: PlaySong
+## Use Case: Play song
+Name: play_song
 
-What it does: Plays a specified song. 
+What it does: Plays an mp3 file.
 
-Inputs: mp3, wav, etc file?
-	song name? 
+Inputs: song_mp3: _mp3_ of a song 
 
-Outputs: the librosa song listening thing 
+Outputs: _IPython.core.display.DisplayObject_ The playable file displayed in the Jupyter notebook.
 
-## Predict genre
-Name: PredictGenre
+## Use Case: Predict genre
+Name: predict_genre
 
-What it does: Predicts the genre of a given song.  If the input is a sound file, returns the prediction for that file.  If the input is a song song name, checks to see if the song is already in the database.  If not, tells you to upload a sound file.  
+What it does: Predicts the genre of a given mp3 file.  Returns a pie chart of the probabilites of nonzero genres.  
 
-Inputs: mp3, wav, etc file?
-	song name: string
+Inputs: song_mp3: _mp3_ of a song.
 
-Outputs: Plot displaying probabilities of genres. String specifying most likely genre. 
+Outputs: pie_chart: _plt.pie_ chart displaying the probabilities of nonzero genres.
+	 most_likely_genre: _string_ specifying the most likely genre. 
 
-## Train Network, validate, etc.
+## Generate spectrogram from audio
+Name: generate_spectrogram
 
-## Preprocessing from audio to tensor
+What it does: Generates a spectrogram of an mp3 file. 
 
-## Load Best Model Parameters
+Inputs: song_mp3: _mp3_ of a song
+	sample_rate: _int_ sample rate of the song
+	n_fft: _int_ length of the fft window
+	hop length: _int_ number of samples between successive frames
+	
+## Train Network
+Name: train_network
 
-## Test our network for accuracy on the test set
+What it does: Trains the neural network. Validates during the training process.
+
+Inputs: train_data: data to train the network 
+	validation_data: data to validate the network 
+	model: architecture of network
+	optimizer: optimizer to use
+	loss function: loss function to use
+	
+Outputs: epoch: _int_ Epoch number
+	 loss: _float_ current loss
+	 
+## Test Network
+Name: test_network
+
+What it does: Tests the network. 
+
+Inputs: test_data: data to test the network
+
+Outputs: accuracy: _float_ test accuracy
+	
+
 
 
 
