@@ -54,15 +54,47 @@ class SpectrogramDataset(Dataset):
         return self.samples[idx]
 
 
-def create_dataset(file_paths_path: str, tracks_csv_path: str, genre_csv_path: str, test_percentage: float = .10,
+def create_dataframes(file_paths_path: str, tracks_csv_path: str, genre_csv_path: str) -> \
+        Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """
+    Create dataframes for audio analysis.
+
+    Args:
+        file_paths_path: (pd.DataFrame) Path to 'all_data_paths.txt' storing the data paths for each sound file.
+        tracks_csv_path: (pd.DataFrame) Path to 'tracks.csv' containing general track data.
+        genre_csv_path: (str) Path to 'genre.csv' containing genre information.
+
+    Returns:
+        file_path_df: (pd.DataFrame) Dataframe storing the data paths for each sound file.
+        track_df: (pd.DataFrame) Dataframe storing general track data.
+        genre_df: (pd.Dataframe) Dataframe storing genre information.
+    """
+
+    file_path_df = pd.read_csv(file_paths_path, header=None, names=['file_path'])
+
+    track_df = pd.read_csv(tracks_csv_path, skiprows=[0, 1, 2],
+                           usecols=[0, 6, 8, 11, 26, 39, 41, 44, 47, 52],
+                           names=['track_id', 'album_id', 'album_listens', 'album_title', 'artist_name',
+                                  'track_favorites', 'track_genres', 'track_interest', 'track_listens',
+                                  'track_title'])
+
+    track_df['track_genres'] = track_df['track_genres'].apply(ast.literal_eval)
+
+    genre_df = pd.read_csv(genre_csv_path, usecols=[0, 3])
+
+    return file_path_df, track_df, genre_df
+
+
+def create_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFrame, genre_df: pd.DataFrame,
+                   test_percentage: float = .10,
                    validation_percentage: float = .10) -> Tuple[Dataset, Dataset, Dataset]:
     """
     Create the custom dataset given the locations of the data.
 
     Args:
-        file_paths_path: (str) Path to 'all_data_paths.txt' storing the data paths for each sound file.
-        tracks_csv_path: (str) Path to 'tracks.csv' containing general track data.
-        genre_csv_path: (str) Path to 'genre.csv' containing genre information.
+        file_path_df: (pd.DataFrame) Dataframe storing the data paths for each sound file.
+        track_df: (pd.DataFrame) Dataframe storing general track data.
+        genre_df: (pd.Dataframe) Dataframe storing genre information.
         test_percentage: (float) Percentage of paths to designate as part of the test dataset.
         validation_percentage: (float) Percentage of paths to designate as part of the validation dataset.
 
@@ -72,22 +104,11 @@ def create_dataset(file_paths_path: str, tracks_csv_path: str, genre_csv_path: s
         test_data: (Dataset) Dataset containing testing music data as spectrograms and genre labels.
     """
 
-    file_paths = pd.read_csv(file_paths_path, header=None, names=['file_path'])
-    train_paths, test_paths = train_test_split(file_paths, test_size=test_percentage)
-    train_paths, validation_paths = train_test_split(file_paths, test_size=validation_percentage)
+    train_paths, test_paths = train_test_split(file_path_df, test_size=test_percentage)
+    train_paths, validation_paths = train_test_split(train_paths, test_size=validation_percentage)
 
-    music_data = pd.read_csv(tracks_csv_path, skiprows=[0, 1, 2],
-                             usecols=[0, 6, 8, 11, 26, 39, 41, 44, 47, 52],
-                             names=['track_id', 'album_id', 'album_listens', 'album_title', 'artist_name',
-                                    'track_favorites', 'track_genres', 'track_interest', 'track_listens',
-                                    'track_title'])
-
-    music_data['track_genres'] = music_data['track_genres'].apply(ast.literal_eval)
-
-    genre_df = pd.read_csv(genre_csv_path, usecols=[0, 3])
-
-    train_data = SpectrogramDataset(train_paths, music_data, genre_df)
-    validation_data = SpectrogramDataset(validation_paths, music_data, genre_df)
-    test_data = SpectrogramDataset(test_paths, music_data, genre_df)
+    train_data = SpectrogramDataset(train_paths, track_df, genre_df)
+    validation_data = SpectrogramDataset(validation_paths, track_df, genre_df)
+    test_data = SpectrogramDataset(test_paths, track_df, genre_df)
 
     return train_data, validation_data, test_data
