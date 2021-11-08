@@ -1,6 +1,6 @@
 """Create a custom dataset that turns mp3 files into spectrograms."""
 
-from pandas import pd
+import pandas as pd
 from torch.utils.data import Dataset
 import warnings
 import librosa
