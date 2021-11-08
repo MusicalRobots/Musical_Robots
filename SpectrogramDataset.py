@@ -1,5 +1,5 @@
 """Create a custom dataset that turns mp3 files into spectrograms."""
-
+import audioread
 import pandas as pd
 from torch.utils.data import Dataset
 import warnings
@@ -31,7 +31,12 @@ class SpectrogramDataset(Dataset):
         for row in path_df.itertuples():
             filename = 'data/fma_small/' + row[1]
 
-            y, sr = librosa.load(filename, sr=None, mono=True)
+            try:
+                y, sr = librosa.load(filename, sr=None, mono=True)
+            except:
+                print('Failed to load ', filename)
+                continue
+
             mel = librosa.feature.melspectrogram(y=y, sr=sr, n_fft=2048, hop_length=512)
 
             song_id = row[1].rsplit('/')[1].rsplit('.')[0].lstrip('0')
@@ -108,7 +113,15 @@ def create_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFrame, genre_df:
     train_paths, validation_paths = train_test_split(train_paths, test_size=validation_percentage)
 
     train_data = SpectrogramDataset(train_paths, track_df, genre_df)
+
+    print('Training dataset created.')
+
     validation_data = SpectrogramDataset(validation_paths, track_df, genre_df)
+
+    print('Validation dataset created.')
+
     test_data = SpectrogramDataset(test_paths, track_df, genre_df)
+
+    print('Test dataset created.')
 
     return train_data, validation_data, test_data
