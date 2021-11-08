@@ -1,5 +1,5 @@
 """Create a custom dataset that turns mp3 files into spectrograms."""
-import audioread
+import torch
 import pandas as pd
 from torch.utils.data import Dataset
 import warnings
@@ -38,6 +38,9 @@ class SpectrogramDataset(Dataset):
                 continue
 
             mel = librosa.feature.melspectrogram(y=y, sr=sr, n_fft=2048, hop_length=512)
+            mel = torch.from_numpy(mel)
+            m = torch.nn.AdaptiveAvgPool1d(2584)
+            mel = m(mel)
 
             song_id = row[1].rsplit('/')[1].rsplit('.')[0].lstrip('0')
             genre_numeric = music_df[music_df['track_id'] == int(song_id)]['track_genres'].item()
