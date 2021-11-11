@@ -49,12 +49,12 @@ def return_most_popular_song(genre: str, genre_df: pd.DataFrame, track_df: pd.Da
         track_df: (pd.DataFrame) Dataframe storing track information.
 
     Outputs:
-        song_title: (List[str]) Most popular song in a given genre according to track listens.
+        most_popular_songs: (List[str]) Most popular song in a given genre according to track listens.
     """
     genre_id = genre_df[genre_df['title'] == genre]['genre_id']
     tracks_in_genre_df = track_df[track_df['track_genres']].apply(lambda x: any([genre_id in x]))
 
-    most_listened_to_songs = tracks_in_genre_df[tracks_in_genre_df['track_listens'] ==
+    most_popular_songs = tracks_in_genre_df[tracks_in_genre_df['track_listens'] ==
                                                 max(tracks_in_genre_df['track_listens'])]['track_title'].to_list()
 
-    return most_listened_to_songs
+    return most_popular_songs
