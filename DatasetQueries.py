@@ -21,7 +21,9 @@ def return_similar_genres(genre: str, genre_df: pd.DataFrame, track_df: pd.DataF
     """
     assert k in range(1, 10), "You can only return between 1 and 10 most similar genres."
 
-    genre_id = genre_df[genre_df['title'] == genre]['genre_id']
+    genre_id = genre_df[genre_df['title'].apply(
+        lambda x: x.lower().replace("-", "").replace(" ", "") == genre.lower().replace("-", "").replace(" ", ""))][
+        'genre_id']
 
     if len(genre_id) == 0:
         print('Genre does not exist in dataset.')
@@ -57,7 +59,13 @@ def return_most_popular_song(genre: str, genre_df: pd.DataFrame, track_df: pd.Da
     Outputs:
         most_popular_songs: (List[str]) Most popular song in a given genre according to track listens.
     """
-    genre_id = genre_df[genre_df['title'] == genre]['genre_id']
+    genre_id = genre_df[genre_df['title'].apply(
+        lambda x: x.lower().replace("-", "").replace(" ", "") == genre.lower().replace("-", "").replace(" ", ""))][
+        'genre_id']
+
+    if len(genre_id) == 0:
+        print('Genre does not exist in dataset.')
+
     tracks_in_genre_df = track_df[track_df['track_genres'].apply(lambda x: any([genre_id in x]))]
 
     most_popular_songs = tracks_in_genre_df[tracks_in_genre_df['track_listens'] ==
