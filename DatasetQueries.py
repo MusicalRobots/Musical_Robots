@@ -1,9 +1,10 @@
 import pandas as pd
 import numpy as np
-from typing import List
+from typing import List, Optional
 
 
-def return_similar_genres(genre: str, genre_df: pd.DataFrame, track_df: pd.DataFrame, k: int = 10) -> List[str]:
+def return_similar_genres(genre: str, genre_df: pd.DataFrame, track_df: pd.DataFrame, k: int = 10) -> \
+        Optional[List[str]]:
     """
     Return up to k most similar genres to the input genre based on how often genres are reported together,
     ranked by decreasing similarity.
@@ -21,8 +22,13 @@ def return_similar_genres(genre: str, genre_df: pd.DataFrame, track_df: pd.DataF
     assert k in range(1, 10), "You can only return between 1 and 10 most similar genres."
 
     genre_id = genre_df[genre_df['title'] == genre]['genre_id']
+
+    if len(genre_id) == 0:
+        print('Genre does not exist in dataset.')
+        return None
+
     co_classified_genres = \
-        np.concatenate(track_df[track_df['track_genres']].apply(lambda x: any([genre_id in x]))['track_genres'])
+        np.concatenate(track_df[track_df['track_genres'].apply(lambda x: any([genre_id in x]))]['track_genres'])
 
     unique_genres, counts = np.unique(co_classified_genres, return_counts=True)
 
@@ -52,7 +58,7 @@ def return_most_popular_song(genre: str, genre_df: pd.DataFrame, track_df: pd.Da
         most_popular_songs: (List[str]) Most popular song in a given genre according to track listens.
     """
     genre_id = genre_df[genre_df['title'] == genre]['genre_id']
-    tracks_in_genre_df = track_df[track_df['track_genres']].apply(lambda x: any([genre_id in x]))
+    tracks_in_genre_df = track_df[track_df['track_genres'].apply(lambda x: any([genre_id in x]))]
 
     most_popular_songs = tracks_in_genre_df[tracks_in_genre_df['track_listens'] ==
                                                 max(tracks_in_genre_df['track_listens'])]['track_title'].to_list()
