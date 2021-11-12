@@ -1,6 +1,8 @@
 """Create a custom dataset that turns mp3 files into spectrograms."""
+import audioread
 import torch
 import pandas as pd
+import numpy as np
 from torch.utils.data import Dataset
 import warnings
 import librosa
@@ -33,9 +35,11 @@ class SpectrogramDataset(Dataset):
 
             try:
                 y, sr = librosa.load(filename, sr=None, mono=True)
-            except:
+            except (RuntimeError, audioread.NoBackendError):
                 print('Failed to load ', filename)
                 continue
+
+            genre_label = np.zeros(len(np.unique(genre_df['genre_id'])))
 
             mel = librosa.feature.melspectrogram(y=y, sr=sr, n_fft=2048, hop_length=512)
             mel = torch.from_numpy(mel)
@@ -44,15 +48,18 @@ class SpectrogramDataset(Dataset):
 
             song_id = row[1].rsplit('/')[1].rsplit('.')[0].lstrip('0')
             genre_numeric = music_df[music_df['track_id'] == int(song_id)]['track_genres'].item()
-            genre = genre_df[genre_df['genre_id'] == genre_numeric[0]]['title'].item()
+            index = genre_df[genre_df['genre_id'] == genre_numeric[0]].index.item()
+            # We can change this to be the whole list instead of just the first element.
+            # ind = genre_df[genre_df['genre_id'].isin(genre_numeric)].index
+            genre_label[index] = 1
 
-            self.samples.append((mel, genre))
+            self.samples.append((mel, genre_label))
 
     def __len__(self) -> int:
         """Return length of dataset."""
         return len(self.samples)
 
-    def __getitem__(self, idx) -> Tuple[librosa.feature.melspectrogram, str]:
+    def __getitem__(self, idx) -> Tuple[librosa.feature.melspectrogram, np.ndarray]:
         """
         Return a single spectrogram and its label from the dataset.
 
