@@ -139,3 +139,62 @@ def play_random_song_from_genre(genre: str, genre_df: pd.DataFrame, track_df: pd
     return ipd.Audio(data=y, rate=sr)
 
 
+def play_song_from_title(title: str, track_df: pd.DataFrame, path_df: pd.DataFrame) -> Optional[ipd.Audio]:
+    """
+    Play a song from its title.
+
+    Args:
+        title: (str) Title of track to play audio.
+        track_df: (pd.DataFrame) Dataframe containing track information.
+        path_df: (pd.DataFrame) Dataframe containing path information)
+
+    Outputs:
+        (Optional[ipd.Audio]): Interactive playable file of song by the specified title.
+
+    """
+    y = None
+    sr = None
+
+    song_ids = track_df[track_df['track_title'] == title]
+    song_ids.reset_index(inplace=True, drop=True)
+
+    row_number = 0
+
+    if len(song_ids) == 0:
+        raise RuntimeError('Song by the title of ', title, ' does not exist in dataset.')
+
+    elif len(song_ids) > 1:
+        print('There are multiple songs with this title.'
+              'Which would you like to hear? Return the corresponding row number.')
+
+        display(song_ids[['album_title', 'artist_name', 'track_title']])
+        row_number = input("Enter the row number: ")
+        row_number = int(row_number)
+
+        if (row_number > len(song_ids) - 1) or (row_number < 0):
+            row_number = input("Invalid row number.  Enter the row number:")
+            row_number = int(row_number)
+
+    song_id = song_ids['track_id'].to_list()[row_number]
+
+    song_id = str(song_id).zfill(6)
+
+    file_path = path_df[path_df['file_path'].str.contains(song_id)]
+
+    if len(file_path) != 0:
+        filename = 'data/fma_small/' + file_path['file_path'].item()
+
+        try:
+            y, sr = librosa.load(filename, sr=None, mono=True)
+
+        except:
+            print('Error loading audio.')
+
+    else:
+        print('Audio file could not be found.')
+        return None
+
+    return ipd.Audio(data=y, rate=sr)
+
+
+

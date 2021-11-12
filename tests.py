@@ -31,9 +31,17 @@ def test_queries():
         return_similar_genres(genre: 'pop', genre_df: pd.DataFrame, track_df: pd.DataFrame, k: int = 11)
     
     try: genre should not exist
-        return_similar_genres(genre: 'screeching cats', genre_df: pd.DataFrame, track_df: pd.DataFrame, k: int = 10)
+        return_similar_genres(genre='screeching cats', genre_df: pd.DataFrame, track_df: pd.DataFrame, k: int = 10)
         return_most_popular_song(genre: 'screeching cats', genre_df, track_df)
-        play_random_song_from_genre(genre: 'screeching cats', genre_df, track_df, path_df)
+        play_random_song_from_genre(genre= 'screeching cats', genre_df, track_df, path_df)
+        
+    try: should return none bc audio not in dataset
+        play_song_from_title(title = '#1', track_df, path_df)
+        
+        should play 
+        play_song_from_title(title= 'This World', track_df, path_df)
+        should fail bc title does not exist
+        play_song_from_title(title= 'Blah', track_df, path_df)    
     """
 
 
