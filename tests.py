@@ -1,3 +1,7 @@
+"""
+tests.py
+Tests for Musical Robots
+"""
 import unittest
 import pandas as pd
 import librosa
@@ -5,24 +9,30 @@ import librosa.display
 
 import SpectrogramDataset
 
-class Testknn(unittest.TestCase):
+class Tests(unittest.TestCase):
+    """
+    Tess calss for Musical Robots
+    """
 
     def test_load(self):
+        """ Test checks if files can load. """
         # check that the data can load, (getting an error in Windows)
         # read input file
-        file_paths = pd.read_csv('data/all_data_paths.txt', header=None, names=['file_path'])
+        file_paths = pd.read_csv('data/all_data_paths.txt', header=None,
+                                names=['file_path'])
 
         # find and load some file
         index = 7999
         filename = 'data/fma_small/' + file_paths['file_path'][index]
-        y, sr = librosa.load(filename, sr=None, mono=True)
+        librosa.load(filename, sr=None, mono=True)
 
     def test_make_SpectrogramDataset(self):
         """ Test making a dataframe with a very shorted version of the data
         """
-        file_path_df, track_df, genre_df = SpectrogramDataset.create_dataframes(file_paths_path = 'data/all_data_path_short.txt' ,
-                                                     tracks_csv_path = 'data/fma_metadata/tracks_short.csv',
-                                                     genre_csv_path = 'data/fma_metadata/genres.csv')
+        SpectrogramDataset.create_dataframes(
+                file_paths_path='data/all_data_path_short.txt',
+                tracks_csv_path='data/fma_metadata/tracks_short.csv',
+                genre_csv_path='data/fma_metadata/genres.csv')
 
     # SpectrogramDataset(Dataset):
     #     """Create custom dataset of spectrograms and genre labels."""
