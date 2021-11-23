@@ -11,18 +11,18 @@ import SpectrogramDataset
 
 class Tests(unittest.TestCase):
     """
-    Tess calss for Musical Robots
+    Test class for Musical Robots
     """
 
     def test_load(self):
         """ Test checks if files can load. """
         # check that the data can load, (getting an error in Windows)
         # read input file
-        file_paths = pd.read_csv('data/all_data_paths.txt', header=None,
+        file_paths = pd.read_csv('data/all_data_path_short.txt', header=None,
                                 names=['file_path'])
 
         # find and load some file
-        index = 7999
+        index = 0
         filename = 'data/fma_small/' + file_paths['file_path'][index]
         librosa.load(filename, sr=None, mono=True)
 
