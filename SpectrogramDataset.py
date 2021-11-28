@@ -103,8 +103,7 @@ class MfccDataset(Dataset):
             genre_label = np.zeros(genre_df['genre_id'].nunique())
 
             mel = librosa.feature.mfcc(y=y)
-            m = torch.nn.AdaptiveAvgPool1d(2500)
-            mel = m(torch.from_numpy(mel))
+            mel = torch.from_numpy(mel)
             mel = (mel - torch.min(mel)) / (torch.max(mel) - torch.min(mel))
 
             song_id = row[1].rsplit('/')[1].rsplit('.')[0].lstrip('0')
@@ -125,7 +124,68 @@ class MfccDataset(Dataset):
         """Return length of dataset."""
         return len(self.samples)
 
-    def __getitem__(self, idx) -> Tuple[librosa.feature.melspectrogram, np.ndarray]:
+    def __getitem__(self, idx) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Return a single spectrogram and its label from the dataset.
+
+        Args:
+            idx: (int) Index of dataset item to return.
+        """
+        return self.samples[idx]
+
+
+class AudioFeature(Dataset):
+    """Create custom dataset of spectrograms and genre labels."""
+
+    def __init__(self, path_df: pd.DataFrame, music_df: pd.DataFrame, genre_df: pd.DataFrame) -> None:
+        """
+        Create list of data tuples.
+
+        Args:
+            path_df: (pd.Dataframe) DataFrame containing file paths.
+            music_df: (pd.DataFrame) Dataframe containing music information.
+            genre_df: (pd.DataFrame) Dataframe containing genre information.
+
+        Attributes:
+            self.samples: (List[Tuple[librosa.feature.melspectrogram, str]]) List of data tuples.
+        """
+        self.samples = []
+
+        for row in path_df.itertuples():
+            filename = 'data/fma_small/' + row[1]
+
+            try:
+                y, sr = librosa.load(filename, sr=None, mono=True)
+            except (RuntimeError, audioread.NoBackendError):
+                print('Failed to load ', filename)
+                continue
+
+            mel = librosa.feature.mfcc(y=y, sr=sr)
+            mel = (mel - np.min(mel)) / (np.max(mel) - np.min(mel))
+
+            zero_crossing_rate = librosa.feature.zero_crossing_rate(y, frame_length=2048, hop_length=1024)
+            spectral_centroid = librosa.feature.spectral_centroid(y, sr=sr, n_fft=2048, hop_length=1024)
+            spectral_contrast = librosa.feature.spectral_contrast(y, sr=sr, n_fft=2048, hop_length=1024)
+            spectral_bandwidth = librosa.feature.spectral_bandwidth(y, sr=sr, n_fft=2048, hop_length=1024)
+            spectral_rolloff = librosa.feature.spectral_rolloff(y, sr=sr, n_fft=2048, hop_length=1024)
+
+            song_id = row[1].rsplit('/')[1].rsplit('.')[0].lstrip('0')
+            try:
+                genre_text = music_df[music_df['track_id'] == int(song_id)]['track_genre_top'].item()
+            except ValueError:
+                continue
+
+            genre_label = genre_df[genre_df['title'] == genre_text].index.item()
+
+            self.samples.append((mel, zero_crossing_rate, spectral_centroid, spectral_contrast,
+                                 spectral_bandwidth, spectral_rolloff, genre_label))
+
+    def __len__(self) -> int:
+        """Return length of dataset."""
+        return len(self.samples)
+
+    def __getitem__(self, idx) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray,
+                                        np.ndarray]:
         """
         Return a single spectrogram and its label from the dataset.
 
@@ -239,6 +299,43 @@ def create_mfcc_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFrame, genr
     print('Validation dataset created.')
 
     test_data = MfccDataset(test_paths, track_df, genre_df)
+
+    print('Test dataset created.')
+
+    return train_data, validation_data, test_data
+
+
+def create_audio_feature_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFrame, genre_df: pd.DataFrame,
+                                 test_percentage: float = .10,
+                                 validation_percentage: float = .10) -> Tuple[Dataset, Dataset, Dataset]:
+    """
+    Create the custom dataset given the locations of the data.
+
+    Args:
+        file_path_df: (pd.DataFrame) Dataframe storing the data paths for each sound file.
+        track_df: (pd.DataFrame) Dataframe storing general track data.
+        genre_df: (pd.Dataframe) Dataframe storing genre information.
+        test_percentage: (float) Percentage of paths to designate as part of the test dataset.
+        validation_percentage: (float) Percentage of paths to designate as part of the validation dataset.
+
+    Returns:
+        train_data: (Dataset) Dataset containing training music data as spectrograms and genre labels.
+        validation_data: (Dataset) Dataset containing validation music data as spectrograms and genre labels.
+        test_data: (Dataset) Dataset containing testing music data as spectrograms and genre labels.
+    """
+
+    train_paths, test_paths = train_test_split(file_path_df, test_size=test_percentage)
+    train_paths, validation_paths = train_test_split(train_paths, test_size=validation_percentage)
+
+    train_data = AudioFeature(train_paths, track_df, genre_df)
+
+    print('Training dataset created.')
+
+    validation_data = AudioFeature(validation_paths, track_df, genre_df)
+
+    print('Validation dataset created.')
+
+    test_data = AudioFeature(test_paths, track_df, genre_df)
 
     print('Test dataset created.')
 
