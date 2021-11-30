@@ -44,7 +44,7 @@ class Tests(unittest.TestCase):
                 genre_csv_path='data/fma_metadata/genres.csv')
 
         #check that splitting is working right
-        train, validate, test = train_validate_test_split(file_path_df)
+        train, validate, test = train_validate_test_split(file_path_df, 0.2, 0.2)
         assert len(train) == 3
         assert len(validate) == 1
         assert len(test) == 1

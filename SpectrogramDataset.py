@@ -339,7 +339,7 @@ def create_mfcc_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFrame, genr
 
     return train_data, validation_data, test_data
 
-def train_validate_test_split(df, train_percent=.6, validate_percent=.2, seed=None):
+def train_validate_test_split(df, test_percent=.2, validate_percent=.2, seed=None):
     """
     to split data into 3 groups: train, validation and test
     got gotten from https://stackoverflow.com/questions/38250710/how-to-split-data-into-3-sets-train-validation-and-test
@@ -347,6 +347,7 @@ def train_validate_test_split(df, train_percent=.6, validate_percent=.2, seed=No
     np.random.seed(seed)
     perm = np.random.permutation(df.index)
     m = len(df.index)
+    train_percent = 1 - test_percent - validate_percent
     train_end = int(train_percent * m)
     validate_end = int(validate_percent * m) + train_end
     train = df.iloc[perm[:train_end]]
@@ -375,7 +376,7 @@ def create_audio_feature_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFr
 
     # train_paths, test_paths = train_test_split(file_path_df, test_size=test_percentage)
     # train_paths, validation_paths = train_test_split(train_paths, test_size=validation_percentage)
-    train, validate, test = train_validate_test_split(file_path_df)
+    train, validate, test = train_validate_test_split(file_path_df,test_percent, validate_percent)
 
     train_data = AudioFeature(train_paths, track_df, genre_df)
 
