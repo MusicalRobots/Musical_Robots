@@ -20,7 +20,7 @@ warnings.filterwarnings("ignore")
 class SpectrogramDataset(Dataset):
     """Create custom dataset of spectrograms and genre labels."""
 
-    def __init__(self, path_df: pd.DataFrame, music_df: pd.DataFrame, genre_df: pd.DataFrame) -> None:
+    def __init__(self, path_df: pd.DataFrame, music_df: pd.DataFrame, genre_df: pd.DataFrame, limit_samples = False, max_samples = 100) -> None:
         """
         Create list of data tuples.
 
@@ -38,8 +38,9 @@ class SpectrogramDataset(Dataset):
 
         print("len of df is ", len(path_df.index))
         for row in tqdm(path_df.itertuples()):
-            if len(self.samples) > 100:
-                break
+            if limit_samples:
+                if len(self.samples) > max_samples:
+                    break
             filename = 'data/fma_small/' + row[1]
 
             try:
@@ -146,7 +147,7 @@ class MfccDataset(Dataset):
 class AudioFeature(Dataset):
     """Create custom dataset of spectrograms and genre labels."""
 
-    def __init__(self, path_df: pd.DataFrame, music_df: pd.DataFrame, genre_df: pd.DataFrame) -> None:
+    def __init__(self, path_df: pd.DataFrame, music_df: pd.DataFrame, genre_df: pd.DataFrame,limit_samples = False, max_samples = 100) -> None:
         """
         Create list of data tuples.
 
@@ -160,7 +161,11 @@ class AudioFeature(Dataset):
         """
         self.samples = []
 
-        for row in path_df.itertuples():
+        for row in tqdm(path_df.itertuples()):
+            #incase we want to quite early
+            if limit_samples:
+                if len(self.samples) > max_samples:
+                    break
             filename = 'data/fma_small/' + row[1]
 
             try:
@@ -354,7 +359,7 @@ def train_validate_test_split(df, test_percent=.2, validate_percent=.2, seed=Non
 
 def create_audio_feature_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFrame, genre_df: pd.DataFrame,
                                  test_percentage: float = .10,
-                                 validation_percentage: float = .10) -> Tuple[Dataset, Dataset, Dataset]:
+                                 validation_percentage: float = .10, limit_samples = False, max_samples = 100) -> Tuple[Dataset, Dataset, Dataset]:
     """
     Create the custom dataset given the locations of the data.
 
@@ -376,15 +381,16 @@ def create_audio_feature_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFr
     train_paths, validation_paths, test_paths = train_validate_test_split(
         file_path_df, test_percentage, validation_percentage)
 
-    train_data = AudioFeature(train_paths, track_df, genre_df)
+    print("Starting making train_data")
+    train_data = AudioFeature(train_paths, track_df, genre_df,limit_samples = limit_samples, max_samples = max_samples)
 
     print('Training dataset created.')
 
-    validation_data = AudioFeature(validation_paths, track_df, genre_df)
+    validation_data = AudioFeature(validation_paths, track_df,genre_df,limit_samples = limit_samples, max_samples = 10)
 
     print('Validation dataset created.')
 
-    test_data = AudioFeature(test_paths, track_df, genre_df)
+    test_data = AudioFeature(test_paths, track_df, genre_df, limit_samples = limit_samples, max_samples = 10)
 
     print('Test dataset created.')
 
