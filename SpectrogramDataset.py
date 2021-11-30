@@ -206,18 +206,18 @@ class AudioFeature(Dataset):
         """
         return self.samples[idx]
 
-    def string_to_num(self):
-        genres = []
-        for i in range(len(train_data)):
-            genre = genres[i]
-            if genre not in genres:
-                genres.append(genre)
-
-        print(genres)
-
-        self.genres_nums = torch.zeros(len(self.genres))
-        for i in range(len(self.genres_nums))
-        self.genres_nums[0] = genres.index(self.genres[i])
+    # def string_to_num(self):
+    #     genres = []
+    #     for i in range(len(train_data)):
+    #         genre = genres[i]
+    #         if genre not in genres:
+    #             genres.append(genre)
+    #
+    #     print(genres)
+    #
+    #     self.genres_nums = torch.zeros(len(self.genres))
+    #     for i in range(len(self.genres_nums))
+    #     self.genres_nums[0] = genres.index(self.genres[i])
 
 class SpectrogramDatasetLoaded(SpectrogramDataset):
     """Create custom dataset of spectrograms and genre labels."""
