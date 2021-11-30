@@ -20,7 +20,7 @@ warnings.filterwarnings("ignore")
 class SpectrogramDataset(Dataset):
     """Create custom dataset of spectrograms and genre labels."""
 
-    def __init__(self, path_df: pd.DataFrame, music_df: pd.DataFrame, genre_df: pd.DataFrame, limit_samples=False, max_samples=100) -> None:
+    def __init__(self, path_df: pd.DataFrame, music_df: pd.DataFrame, genre_df: pd.DataFrame, limit_samples=False, max_samples=100, samples=None) -> None:
         """
         Create list of data tuples.
 
@@ -32,44 +32,46 @@ class SpectrogramDataset(Dataset):
         Attributes:
             self.samples: (List[Tuple[librosa.feature.melspectrogram, str]]) List of data tuples.
         """
-        self.samples = []
-        self.data = []
-        self.genres = []
+        if samples is not None:
+            self.samples = samples
+        else:
+        # self.data = []
+        # self.genres = []
 
-        print("len of df is ", len(path_df.index))
-        for row in tqdm(path_df.itertuples()):
-            if limit_samples:
-                if len(self.samples) > max_samples:
-                    break
-            filename = 'data/fma_small/' + row[1]
+            print("len of df is ", len(path_df.index))
+            for row in tqdm(path_df.itertuples()):
+                if limit_samples:
+                    if len(self.samples) > max_samples:
+                        break
+                filename = 'data/fma_small/' + row[1]
 
-            try:
-                y, sr = librosa.load(filename, sr=None, mono=True)
-            except (RuntimeError, audioread.NoBackendError):
-                print('Failed to load ', filename)
-                continue
+                try:
+                    y, sr = librosa.load(filename, sr=None, mono=True)
+                except (RuntimeError, audioread.NoBackendError):
+                    print('Failed to load ', filename)
+                    continue
 
-            genre_label = np.zeros(genre_df['genre_id'].nunique())
+                genre_label = np.zeros(genre_df['genre_id'].nunique())
 
-            mel = librosa.feature.melspectrogram(y=y, sr=sr, n_fft=2048, hop_length=1024)
-            mel = torch.from_numpy(mel)
-            m = torch.nn.AdaptiveAvgPool1d(1292)
-            mel = m(mel)
-            mel = (mel - torch.min(mel))/(torch.max(mel) - torch.min(mel))
+                mel = librosa.feature.melspectrogram(y=y, sr=sr, n_fft=2048, hop_length=1024)
+                mel = torch.from_numpy(mel)
+                m = torch.nn.AdaptiveAvgPool1d(1292)
+                mel = m(mel)
+                mel = (mel - torch.min(mel))/(torch.max(mel) - torch.min(mel))
 
-            song_id = row[1].rsplit('/')[1].rsplit('.')[0].lstrip('0')
+                song_id = row[1].rsplit('/')[1].rsplit('.')[0].lstrip('0')
 
-            try:
-                genre_text = music_df[music_df['track_id'] == int(song_id)]['track_genre_top'].item()
-            except ValueError:
-                continue
+                try:
+                    genre_text = music_df[music_df['track_id'] == int(song_id)]['track_genre_top'].item()
+                except ValueError:
+                    continue
 
-            index = genre_df[genre_df['title'] == genre_text].index.item()
-            genre_label[index] = 1
+                index = genre_df[genre_df['title'] == genre_text].index.item()
+                genre_label[index] = 1
 
-            genre_label = torch.from_numpy(genre_label)
+                genre_label = torch.from_numpy(genre_label)
 
-            self.samples.append((mel, genre_label))
+                self.samples.append((mel, genre_label))
 
     def __len__(self) -> int:
         """Return length of dataset."""
@@ -147,7 +149,9 @@ class MfccDataset(Dataset):
 class AudioFeature(Dataset):
     """Create custom dataset of spectrograms and genre labels."""
 
-    def __init__(self, path_df: pd.DataFrame, music_df: pd.DataFrame, genre_df: pd.DataFrame, limit_samples=False, max_samples=100) -> None:
+    def __init__(self, path_df: pd.DataFrame = None, music_df: pd.DataFrame = None,
+                genre_df: pd.DataFrame = None, limit_samples=False,
+                max_samples=100,samples=None) -> None:
         """
         Create list of data tuples.
 
@@ -159,40 +163,43 @@ class AudioFeature(Dataset):
         Attributes:
             self.samples: (List[Tuple[librosa.feature.melspectrogram, str]]) List of data tuples.
         """
-        self.samples = []
+        if samples is not None:
+            self.samples = samples
+        else: #make new
+            self.samples = []
 
-        for row in tqdm(path_df.itertuples()):
-            #incase we want to quite early
-            if limit_samples:
-                if len(self.samples) > max_samples:
-                    break
-            filename = 'data/fma_small/' + row[1]
+            for row in tqdm(path_df.itertuples()):
+                #incase we want to quite early
+                if limit_samples:
+                    if len(self.samples) > max_samples:
+                        break
+                filename = 'data/fma_small/' + row[1]
 
-            try:
-                y, sr = librosa.load(filename, sr=None, mono=True)
-            except (RuntimeError, audioread.NoBackendError):
-                print('Failed to load ', filename)
-                continue
+                try:
+                    y, sr = librosa.load(filename, sr=None, mono=True)
+                except (RuntimeError, audioread.NoBackendError):
+                    print('Failed to load ', filename)
+                    continue
 
-            mel = librosa.feature.mfcc(y=y, sr=sr)
-            mel = (mel - np.min(mel)) / (np.max(mel) - np.min(mel))
+                mel = librosa.feature.mfcc(y=y, sr=sr)
+                mel = (mel - np.min(mel)) / (np.max(mel) - np.min(mel))
 
-            zero_crossing_rate = librosa.feature.zero_crossing_rate(y, frame_length=2048, hop_length=1024)
-            spectral_centroid = librosa.feature.spectral_centroid(y, sr=sr, n_fft=2048, hop_length=1024)
-            spectral_contrast = librosa.feature.spectral_contrast(y, sr=sr, n_fft=2048, hop_length=1024)
-            spectral_bandwidth = librosa.feature.spectral_bandwidth(y, sr=sr, n_fft=2048, hop_length=1024)
-            spectral_rolloff = librosa.feature.spectral_rolloff(y, sr=sr, n_fft=2048, hop_length=1024)
+                zero_crossing_rate = librosa.feature.zero_crossing_rate(y, frame_length=2048, hop_length=1024)
+                spectral_centroid = librosa.feature.spectral_centroid(y, sr=sr, n_fft=2048, hop_length=1024)
+                spectral_contrast = librosa.feature.spectral_contrast(y, sr=sr, n_fft=2048, hop_length=1024)
+                spectral_bandwidth = librosa.feature.spectral_bandwidth(y, sr=sr, n_fft=2048, hop_length=1024)
+                spectral_rolloff = librosa.feature.spectral_rolloff(y, sr=sr, n_fft=2048, hop_length=1024)
 
-            song_id = row[1].rsplit('/')[1].rsplit('.')[0].lstrip('0')
-            try:
-                genre_text = music_df[music_df['track_id'] == int(song_id)]['track_genre_top'].item()
-            except ValueError:
-                continue
+                song_id = row[1].rsplit('/')[1].rsplit('.')[0].lstrip('0')
+                try:
+                    genre_text = music_df[music_df['track_id'] == int(song_id)]['track_genre_top'].item()
+                except ValueError:
+                    continue
 
-            genre_label = genre_df[genre_df['title'] == genre_text].index.item()
+                genre_label = genre_df[genre_df['title'] == genre_text].index.item()
 
-            self.samples.append((mel, zero_crossing_rate, spectral_centroid, spectral_contrast,
-                                 spectral_bandwidth, spectral_rolloff, genre_label))
+                self.samples.append((mel, zero_crossing_rate, spectral_centroid, spectral_contrast,
+                                     spectral_bandwidth, spectral_rolloff, genre_label))
 
     def __len__(self) -> int:
         """Return length of dataset."""
@@ -208,28 +215,6 @@ class AudioFeature(Dataset):
         """
         return self.samples[idx]
 
-    # def string_to_num(self):
-    #     genres = []
-    #     for i in range(len(train_data)):
-    #         genre = genres[i]
-    #         if genre not in genres:
-    #             genres.append(genre)
-    #
-    #     print(genres)
-    #
-    #     self.genres_nums = torch.zeros(len(self.genres))
-    #     for i in range(len(self.genres_nums))
-    #     self.genres_nums[0] = genres.index(self.genres[i])
-
-class SpectrogramDatasetLoaded(SpectrogramDataset):
-    """Create custom dataset of spectrograms and genre labels."""
-
-    def __init__(self, data, genres):
-
-        self.data = data
-        self.genres = genres
-
-        # self.string_to_num()
 
 def create_dataframes(file_paths_path: str, tracks_csv_path: str, genre_csv_path: str) -> \
         Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
@@ -393,5 +378,25 @@ def create_audio_feature_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFr
     test_data = AudioFeature(test_paths, track_df, genre_df, limit_samples=limit_samples, max_samples=10)
 
     print('Test dataset created.')
+
+    return train_data, validation_data, test_data
+
+def load_audio_feature_dataset(train_samples_file, val_sample_file, test_sample_file):
+    """
+    Loads the custom dataset given the locations of the data.
+
+    Args:
+        ###ADD###
+
+    Returns:
+        train_data: (Dataset) Dataset containing training music data as spectrograms and genre labels.
+        validation_data: (Dataset) Dataset containing validation music data as spectrograms and genre labels.
+        test_data: (Dataset) Dataset containing testing music data as spectrograms and genre labels.
+    """
+
+    print("loading datasets")
+    train_data = AudioFeature(samples = np.load(train_samples_file, allow_pickle = True))
+    validation_data = AudioFeature(samples = np.load(val_sample_file, allow_pickle = True))
+    test_data = AudioFeature(samples = np.load(test_sample_file, allow_pickle = True))
 
     return train_data, validation_data, test_data
