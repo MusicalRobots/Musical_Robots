@@ -374,8 +374,7 @@ def create_audio_feature_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFr
     # train_paths, test_paths = train_test_split(file_path_df, test_size=test_percentage)
     # train_paths, validation_paths = train_test_split(train_paths, test_size=validation_percentage)
     train_paths, validation_paths, test_paths = train_validate_test_split(
-                                                file_path_df,test_percentage,
-                                                validation_percentage)
+        file_path_df, test_percentage, validation_percentage)
 
     train_data = AudioFeature(train_paths, track_df, genre_df)
 

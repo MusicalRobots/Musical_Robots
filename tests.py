@@ -7,7 +7,7 @@ import pandas as pd
 import librosa
 import librosa.display
 
-from SpectrogramDataset import *
+from SpectrogramDataset import create_dataframes, train_validate_test_split, AudioFeature
 
 
 class Tests(unittest.TestCase):
@@ -20,28 +20,27 @@ class Tests(unittest.TestCase):
         # check that the data can load, (getting an error in Windows)
         # read input file
         file_paths = pd.read_csv('data/all_data_path_short.txt', header=None,
-                                names=['file_path'])
+                                 names=['file_path'])
 
         # find and load some file
         index = 0
         filename = 'data/fma_small/' + file_paths['file_path'][index]
         librosa.load(filename, sr=None, mono=True)
 
-    def test_make_SpectrogramDataset(self):
+    def test_make_spectrogram_dataset(self):
         """ Test making a dataframe with a very shorted version of the data
         """
 
-        file_path_df, track_df, genre_df = create_dataframes(
-                file_paths_path='data/all_data_path_short.txt',
-                tracks_csv_path='data/fma_metadata/tracks_short.csv',
-                genre_csv_path='data/fma_metadata/genres.csv')
+        create_dataframes(file_paths_path='data/all_data_path_short.txt',
+                          tracks_csv_path='data/fma_metadata/tracks_short.csv',
+                          genre_csv_path='data/fma_metadata/genres.csv')
 
     def test_split(self):
         """ test that the splitting function is working right"""
         file_path_df, track_df, genre_df = create_dataframes(
-                file_paths_path='data/all_data_path_short.txt',
-                tracks_csv_path='data/fma_metadata/tracks_short.csv',
-                genre_csv_path='data/fma_metadata/genres.csv')
+            file_paths_path='data/all_data_path_short.txt',
+            tracks_csv_path='data/fma_metadata/tracks_short.csv',
+            genre_csv_path='data/fma_metadata/genres.csv')
 
         #check that splitting is working right
         train, validate, test = train_validate_test_split(file_path_df, 0.2, 0.2)
@@ -52,9 +51,9 @@ class Tests(unittest.TestCase):
     def test_audio_feature(self):
         """ Test making an audio feature object """
         file_path_df, track_df, genre_df = create_dataframes(
-                file_paths_path='data/all_data_path_short.txt',
-                tracks_csv_path='data/fma_metadata/tracks_short.csv',
-                genre_csv_path='data/fma_metadata/genres.csv')
+            file_paths_path='data/all_data_path_short.txt',
+            tracks_csv_path='data/fma_metadata/tracks_short.csv',
+            genre_csv_path='data/fma_metadata/genres.csv')
         #make 1 Audio data class
         train_data = AudioFeature(file_path_df, track_df, genre_df)
 
