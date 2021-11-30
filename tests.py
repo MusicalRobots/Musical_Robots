@@ -7,7 +7,8 @@ import pandas as pd
 import librosa
 import librosa.display
 
-import SpectrogramDataset
+from SpectrogramDataset import *
+
 
 class Tests(unittest.TestCase):
     """
@@ -29,10 +30,22 @@ class Tests(unittest.TestCase):
     def test_make_SpectrogramDataset(self):
         """ Test making a dataframe with a very shorted version of the data
         """
-        SpectrogramDataset.create_dataframes(
+
+        file_path_df, track_df, genre_df = create_dataframes(
                 file_paths_path='data/all_data_path_short.txt',
                 tracks_csv_path='data/fma_metadata/tracks_short.csv',
                 genre_csv_path='data/fma_metadata/genres.csv')
+
+        #make 1 Audio data class
+        train_data = AudioFeature(file_path_df, track_df, genre_df)
+
+        # train_data, validation_data, test_data = create_audio_feature_dataset(
+        #                                         file_path_df, track_df,
+        #                                         genre_df, test_percentage = .2,
+        #                                         validation_percentage = .2)
+
+
+
 
     # SpectrogramDataset(Dataset):
     #     """Create custom dataset of spectrograms and genre labels."""

@@ -227,7 +227,7 @@ class SpectrogramDatasetLoaded(SpectrogramDataset):
         self.data = data
         self.genres = genres
 
-        self.string_to_num()
+        # self.string_to_num()
 
 def create_dataframes(file_paths_path: str, tracks_csv_path: str, genre_csv_path: str) -> \
         Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
