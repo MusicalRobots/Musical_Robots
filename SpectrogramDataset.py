@@ -1,12 +1,14 @@
 """Create a custom dataset that turns mp3 files into spectrograms."""
+from typing import Tuple
+import warnings
+
 import audioread
 import torch
 import pandas as pd
 import numpy as np
 from torch.utils.data import Dataset
-import warnings
 import librosa
-from typing import Tuple
+
 from sklearn.model_selection import train_test_split
 
 # from tqdm.notebook import tqdm
@@ -121,16 +123,11 @@ class MfccDataset(Dataset):
                 continue
 
             index = genre_df[genre_df['title'] == genre_text].index.item()
-
             genre_label[index] = 1
 
-            self.data.append(mel)
-            self.genres.append(genre)
-            self.samples.append((mel, genre))
+            genre_label = torch.from_numpy(genre_label)
 
-            # genre_label = torch.from_numpy(genre_label)
-            #
-            # self.samples.append((mel, genre_label))
+            self.samples.append((mel, genre_label))
 
     def __len__(self) -> int:
         """Return length of dataset."""
@@ -376,7 +373,9 @@ def create_audio_feature_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFr
 
     # train_paths, test_paths = train_test_split(file_path_df, test_size=test_percentage)
     # train_paths, validation_paths = train_test_split(train_paths, test_size=validation_percentage)
-    train, validate, test = train_validate_test_split(file_path_df,test_percent, validate_percent)
+    train_paths, validation_paths, test_paths = train_validate_test_split(
+                                                file_path_df,test_percentage,
+                                                validation_percentage)
 
     train_data = AudioFeature(train_paths, track_df, genre_df)
 
