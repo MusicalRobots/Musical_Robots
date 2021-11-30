@@ -36,13 +36,28 @@ class Tests(unittest.TestCase):
                 tracks_csv_path='data/fma_metadata/tracks_short.csv',
                 genre_csv_path='data/fma_metadata/genres.csv')
 
+    def test_split(self):
+        """ test that the splitting function is working right"""
+        file_path_df, track_df, genre_df = create_dataframes(
+                file_paths_path='data/all_data_path_short.txt',
+                tracks_csv_path='data/fma_metadata/tracks_short.csv',
+                genre_csv_path='data/fma_metadata/genres.csv')
+
+        #check that splitting is working right
+        train, validate, test = train_validate_test_split(file_path_df)
+        assert len(train) == 3
+        assert len(validate) == 1
+        assert len(test) == 1
+
+    def test_audio_feature(self):
+        """ Test making an audio feature object """
+        file_path_df, track_df, genre_df = create_dataframes(
+                file_paths_path='data/all_data_path_short.txt',
+                tracks_csv_path='data/fma_metadata/tracks_short.csv',
+                genre_csv_path='data/fma_metadata/genres.csv')
         #make 1 Audio data class
         train_data = AudioFeature(file_path_df, track_df, genre_df)
 
-        # train_data, validation_data, test_data = create_audio_feature_dataset(
-        #                                         file_path_df, track_df,
-        #                                         genre_df, test_percentage = .2,
-        #                                         validation_percentage = .2)
 
 
 
