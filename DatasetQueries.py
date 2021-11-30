@@ -4,6 +4,8 @@ from typing import List, Optional
 import random
 import librosa
 import IPython.display as ipd
+import audioread
+
 
 
 def return_similar_genres(genre: str, genre_df: pd.DataFrame, track_df: pd.DataFrame, k: int = 10) -> List[str]:
@@ -125,7 +127,7 @@ def play_random_song_from_genre(genre: str, genre_df: pd.DataFrame, track_df: pd
             try:
                 y, sr = librosa.load(filename, sr=None, mono=True)
 
-            except:
+            except (RuntimeError, audioread.NoBackendError):
                 continue
 
             status = True
@@ -156,6 +158,7 @@ def play_song_from_title(title: str, track_df: pd.DataFrame, path_df: pd.DataFra
     sr = None
 
     song_ids = track_df[track_df['track_title'] == title]
+
     song_ids.reset_index(inplace=True, drop=True)
 
     row_number = 0
@@ -184,11 +187,7 @@ def play_song_from_title(title: str, track_df: pd.DataFrame, path_df: pd.DataFra
     if len(file_path) != 0:
         filename = 'data/fma_small/' + file_path['file_path'].item()
 
-        try:
-            y, sr = librosa.load(filename, sr=None, mono=True)
-
-        except:
-            print('Error loading audio.')
+        play_song_from_filename(filename=filename)
 
     else:
         print('Audio file could not be found.')
@@ -197,4 +196,16 @@ def play_song_from_title(title: str, track_df: pd.DataFrame, path_df: pd.DataFra
     return ipd.Audio(data=y, rate=sr)
 
 
-
+def play_song_from_filename(filename: str) -> Optional[ipd.Audio]:
+    """
+    Args:
+        filename: (str) Filename to read audio from.
+    Returns:
+        (ipd.Audio) Audio clip.
+    """
+    try:
+        y, sr = librosa.load(filename, sr=None, mono=True)
+    except (RuntimeError, audioread.NoBackendError):
+        print('Error loading audio.')
+        return None
+    return ipd.Audio(data=y, rate=sr)
