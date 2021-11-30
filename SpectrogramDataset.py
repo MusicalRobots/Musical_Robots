@@ -9,6 +9,9 @@ import librosa
 from typing import Tuple
 from sklearn.model_selection import train_test_split
 
+# from tqdm.notebook import tqdm
+from tqdm import tqdm
+
 warnings.filterwarnings("ignore")
 
 
@@ -28,8 +31,13 @@ class SpectrogramDataset(Dataset):
             self.samples: (List[Tuple[librosa.feature.melspectrogram, str]]) List of data tuples.
         """
         self.samples = []
+        self.data = []
+        self.genres = []
 
-        for row in path_df.itertuples():
+        print("len of df is ", len(path_df.index))
+        for row in tqdm(path_df.itertuples()):
+            if len(self.samples) > 100:
+                break
             filename = 'data/fma_small/' + row[1]
 
             try:
@@ -55,7 +63,7 @@ class SpectrogramDataset(Dataset):
 
             index = genre_df[genre_df['title'] == genre_text].index.item()
             genre_label[index] = 1
-            
+
             genre_label = torch.from_numpy(genre_label)
 
             self.samples.append((mel, genre_label))
@@ -116,9 +124,13 @@ class MfccDataset(Dataset):
 
             genre_label[index] = 1
 
-            genre_label = torch.from_numpy(genre_label)
+            self.data.append(mel)
+            self.genres.append(genre)
+            self.samples.append((mel, genre))
 
-            self.samples.append((mel, genre_label))
+            # genre_label = torch.from_numpy(genre_label)
+            #
+            # self.samples.append((mel, genre_label))
 
     def __len__(self) -> int:
         """Return length of dataset."""
@@ -194,6 +206,28 @@ class AudioFeature(Dataset):
         """
         return self.samples[idx]
 
+    def string_to_num(self):
+        genres = []
+        for i in range(len(train_data)):
+            genre = genres[i]
+            if genre not in genres:
+                genres.append(genre)
+
+        print(genres)
+
+        self.genres_nums = torch.zeros(len(self.genres))
+        for i in range(len(self.genres_nums))
+        self.genres_nums[0] = genres.index(self.genres[i])
+
+class SpectrogramDatasetLoaded(SpectrogramDataset):
+    """Create custom dataset of spectrograms and genre labels."""
+
+    def __init__(self, data, genres):
+
+        self.data = data
+        self.genres = genres
+
+        self.string_to_num()
 
 def create_dataframes(file_paths_path: str, tracks_csv_path: str, genre_csv_path: str) -> \
         Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
@@ -253,6 +287,7 @@ def create_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFrame, genre_df:
     train_paths, test_paths = train_test_split(file_path_df, test_size=test_percentage)
     train_paths, validation_paths = train_test_split(train_paths, test_size=validation_percentage)
 
+    print("Start making Training set")
     train_data = SpectrogramDataset(train_paths, track_df, genre_df)
 
     print('Training dataset created.')
