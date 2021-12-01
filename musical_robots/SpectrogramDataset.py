@@ -6,6 +6,7 @@ import numpy as np
 from torch.utils.data import Dataset
 import warnings
 import librosa
+import ast
 from typing import Tuple
 from sklearn.model_selection import train_test_split
 
@@ -196,7 +197,7 @@ class AudioFeature(Dataset):
 
 
 def create_dataframes(file_paths_path: str, tracks_csv_path: str, genre_csv_path: str) -> \
-        Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Create dataframes for audio analysis.
 
@@ -208,7 +209,8 @@ def create_dataframes(file_paths_path: str, tracks_csv_path: str, genre_csv_path
     Returns:
         file_path_df: (pd.DataFrame) Dataframe storing the data paths for each sound file.
         track_df: (pd.DataFrame) Dataframe storing general track data.
-        genre_df: (pd.Dataframe) Dataframe storing genre information.
+        relevant_genre_df: (pd.DataFrame) Dataframe storing genre information.
+        genre_df: (pd.DataFrame)
     """
 
     file_path_df = pd.read_csv(file_paths_path, header=None, names=['file_path'])
@@ -221,6 +223,11 @@ def create_dataframes(file_paths_path: str, tracks_csv_path: str, genre_csv_path
 
     track_df = track_df[track_df['track_genre_top'].notna()]
 
+    def filter(row):
+        return [int(i) for i in ast.literal_eval(row['track_genres'])]
+
+    track_df['track_genres'] = track_df.apply(filter, axis=1)
+
     genre_df = pd.read_csv(genre_csv_path, usecols=[0, 3])
     relevant_indices = []
     for genre in track_df['track_genre_top'].unique():
@@ -228,7 +235,7 @@ def create_dataframes(file_paths_path: str, tracks_csv_path: str, genre_csv_path
     relevant_genre_df = genre_df.iloc[relevant_indices]
     relevant_genre_df.reset_index(inplace=True)
 
-    return file_path_df, track_df, relevant_genre_df
+    return file_path_df, track_df, relevant_genre_df, genre_df
 
 
 def create_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFrame, genre_df: pd.DataFrame,

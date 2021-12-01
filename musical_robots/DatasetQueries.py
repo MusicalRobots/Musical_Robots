@@ -7,7 +7,6 @@ import IPython.display as ipd
 import audioread
 
 
-
 def return_similar_genres(genre: str, genre_df: pd.DataFrame, track_df: pd.DataFrame, k: int = 10) -> List[str]:
     """
     Return up to k most similar genres to the input genre based on how often genres are reported together,
@@ -187,14 +186,12 @@ def play_song_from_title(title: str, track_df: pd.DataFrame, path_df: pd.DataFra
     if len(file_path) != 0:
         filename = 'data/fma_small/' + file_path['file_path'].item()
 
-        play_song_from_filename(filename=filename)
+        audio = play_song_from_filename(filename=filename)
 
+        return audio
     else:
         print('Audio file could not be found.')
         return None
-
-    return ipd.Audio(data=y, rate=sr)
-
 
 def play_song_from_filename(filename: str) -> Optional[ipd.Audio]:
     """
