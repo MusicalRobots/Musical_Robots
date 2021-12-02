@@ -6,6 +6,7 @@ import IPython.display as ipd
 import os
 import librosa
 import warnings
+import audioread
 
 from ipywidgets import interact, interact_manual
 from IPython.display import Image, display, HTML, Audio, clear_output
@@ -105,7 +106,5 @@ def save_file(uploader):
                 y, sr = librosa.load(uploaded_filename)
                 return y,sr
 
-            except (RuntimeError, audioread.NoBackendError):
-                print('Failed to load ', uploaded_filename)
-
-                display(HTML('<h2>Sorry, the file you uploaded is not compatible, please check your music/audio and upload again<h2>'))
+            except (RuntimeError, TypeError, audioread.NoBackendError):
+                display(HTML('<h2>Sorry, the file you uploaded is not compatible, please check your music/audio file and upload again<h2>'))
