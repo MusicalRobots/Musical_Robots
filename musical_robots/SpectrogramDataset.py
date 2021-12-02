@@ -16,7 +16,7 @@ warnings.filterwarnings("ignore")
 class SpectrogramDataset(Dataset):
     """Create custom dataset of spectrograms and genre labels."""
 
-    def __init__(self, path_df: pd.DataFrame, music_df: pd.DataFrame, genre_df: pd.DataFrame) -> None:
+    def __init__(self, path_df: pd.DataFrame, music_df: pd.DataFrame, genre_df: pd.DataFrame, limit_samples=False, max_samples=100, samples=None) -> None:
         """
         Create list of data tuples.
 
@@ -28,35 +28,40 @@ class SpectrogramDataset(Dataset):
         Attributes:
             self.samples: (List[Tuple[librosa.feature.melspectrogram, str]]) List of data tuples.
         """
-        self.samples = []
+        if samples is not None:
+            self.samples = samples
+        else:
+        # self.data = []
+        # self.genres = []
 
-        for row in path_df.itertuples():
-            filename = 'data/fma_small/' + row[1]
+            print("len of df is ", len(path_df.index))
+            for row in tqdm(path_df.itertuples()):
+                if limit_samples:
+                    if len(self.samples) > max_samples:
+                        break
+                filename = 'data/fma_small/' + row[1]
 
-            try:
-                y, sr = librosa.load(filename, sr=None, mono=True)
-            except (RuntimeError, audioread.NoBackendError):
-                print('Failed to load ', filename)
-                continue
+                try:
+                    y, sr = librosa.load(filename, sr=None, mono=True)
+                except (RuntimeError, audioread.NoBackendError):
+                    print('Failed to load ', filename)
+                    continue
 
-            genre_label = np.zeros(genre_df['genre_id'].nunique())
+                genre_label = np.zeros(genre_df['genre_id'].nunique())
 
-            mel = librosa.feature.melspectrogram(y=y, sr=sr, n_fft=2048, hop_length=1024)
-            mel = torch.from_numpy(mel)
-            m = torch.nn.AdaptiveAvgPool1d(1292)
-            mel = m(mel)
-            mel = (mel - torch.min(mel))/(torch.max(mel) - torch.min(mel))
+                mel = librosa.feature.melspectrogram(y=y, sr=sr, n_fft=2048, hop_length=1024)
+                mel = torch.from_numpy(mel)
+                m = torch.nn.AdaptiveAvgPool1d(1292)
+                mel = m(mel)
+                mel = (mel - torch.min(mel))/(torch.max(mel) - torch.min(mel))
 
-            song_id = row[1].rsplit('/')[1].rsplit('.')[0].lstrip('0')
-
-            try:
-                genre_text = music_df[music_df['track_id'] == int(song_id)]['track_genre_top'].item()
-            except ValueError:
-                continue
+                song_id = row[1].rsplit('/')[1].rsplit('.')[0].lstrip('0')
 
             index = genre_df[genre_df['title'] == genre_text].index.item()
             genre_label[index] = 1
-            
+
+            genre_label = torch.from_numpy(genre_label)
+
             genre_label = torch.from_numpy(genre_label)
 
             self.samples.append((mel, genre_label))
@@ -138,7 +143,9 @@ class MfccDataset(Dataset):
 class AudioFeature(Dataset):
     """Create custom dataset of spectrograms and genre labels."""
 
-    def __init__(self, path_df: pd.DataFrame, music_df: pd.DataFrame, genre_df: pd.DataFrame) -> None:
+    def __init__(self, path_df: pd.DataFrame = None, music_df: pd.DataFrame = None,
+                genre_df: pd.DataFrame = None, limit_samples=False,
+                max_samples=100) -> None:
         """
         Create list of data tuples.
 
@@ -237,6 +244,24 @@ def create_dataframes(file_paths_path: str, tracks_csv_path: str, genre_csv_path
 
     return file_path_df, track_df, relevant_genre_df, genre_df
 
+def split_data(file_path_df: pd.DataFrame, test_percentage: pd.DataFrame, validation_percentage: pd.DataFrame):
+    """
+        Splits data into 3 datasets for training, testing and validation
+
+        Args:
+            file_path_df: (pd.DataFrame) Dataframe storing the data paths for each sound file.
+            test_percentage: (float) Percentage of paths to designate as part of the test dataset.
+            validation_percentage: (float) Percentage of paths to designate as part of the validation dataset.
+
+        Returns:
+            train_paths: (pd.DataFrame) paths of data for the training set
+            testing_paths: (pd.DataFrame) paths of data for the testing set
+            validation_paths: (pd.DataFrame) paths of data for the validation set
+    """
+    train_paths, test_paths = train_test_split(file_path_df, test_size=test_percentage)
+    train_paths, validation_paths = train_test_split(train_paths, test_size=validation_percentage)
+
+    return train_paths, test_paths, validation_paths
 
 def create_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFrame, genre_df: pd.DataFrame,
                    test_percentage: float = .10,
@@ -257,8 +282,9 @@ def create_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFrame, genre_df:
         test_data: (Dataset) Dataset containing testing music data as spectrograms and genre labels.
     """
 
-    train_paths, test_paths = train_test_split(file_path_df, test_size=test_percentage)
-    train_paths, validation_paths = train_test_split(train_paths, test_size=validation_percentage)
+    # train_paths, test_paths = train_test_split(file_path_df, test_size=test_percentage)
+    # train_paths, validation_paths = train_test_split(train_paths, test_size=validation_percentage)
+    train_paths, test_paths, validation_paths = split_data(file_path_df, test_percentage, validation_percentage)
 
     train_data = SpectrogramDataset(train_paths, track_df, genre_df)
 
@@ -314,7 +340,7 @@ def create_mfcc_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFrame, genr
 
 def create_audio_feature_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFrame, genre_df: pd.DataFrame,
                                  test_percentage: float = .10,
-                                 validation_percentage: float = .10) -> Tuple[Dataset, Dataset, Dataset]:
+                                 validation_percentage: float = .10, limit_samples=False, max_samples=100) -> Tuple[Dataset, Dataset, Dataset]:
     """
     Create the custom dataset given the locations of the data.
 
@@ -334,16 +360,37 @@ def create_audio_feature_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFr
     train_paths, test_paths = train_test_split(file_path_df, test_size=test_percentage)
     train_paths, validation_paths = train_test_split(train_paths, test_size=validation_percentage)
 
-    train_data = AudioFeature(train_paths, track_df, genre_df)
+    print("Starting making train_data")
+    train_data = AudioFeature(train_paths, track_df, genre_df, limit_samples=limit_samples, max_samples=max_samples)
 
     print('Training dataset created.')
 
-    validation_data = AudioFeature(validation_paths, track_df, genre_df)
+    validation_data = AudioFeature(validation_paths, track_df, genre_df, limit_samples=limit_samples, max_samples=10)
 
     print('Validation dataset created.')
 
-    test_data = AudioFeature(test_paths, track_df, genre_df)
+    test_data = AudioFeature(test_paths, track_df, genre_df, limit_samples=limit_samples, max_samples=10)
 
     print('Test dataset created.')
+
+    return train_data, validation_data, test_data
+
+def load_audio_feature_dataset(train_samples_file, val_sample_file, test_sample_file):
+    """
+    Loads the custom dataset given the locations of the data.
+
+    Args:
+        ###ADD###
+
+    Returns:
+        train_data: (Dataset) Dataset containing training music data as spectrograms and genre labels.
+        validation_data: (Dataset) Dataset containing validation music data as spectrograms and genre labels.
+        test_data: (Dataset) Dataset containing testing music data as spectrograms and genre labels.
+    """
+
+    print("loading datasets")
+    train_data = AudioFeature(samples = np.load(train_samples_file, allow_pickle = True))
+    validation_data = AudioFeature(samples = np.load(val_sample_file, allow_pickle = True))
+    test_data = AudioFeature(samples = np.load(test_sample_file, allow_pickle = True))
 
     return train_data, validation_data, test_data
