@@ -62,9 +62,9 @@ class SpectrogramDataset(Dataset):
 
             genre_label = torch.from_numpy(genre_label)
 
-                genre_label = torch.from_numpy(genre_label)
+            genre_label = torch.from_numpy(genre_label)
 
-                self.samples.append((mel, genre_label))
+            self.samples.append((mel, genre_label))
 
     def __len__(self) -> int:
         """Return length of dataset."""
