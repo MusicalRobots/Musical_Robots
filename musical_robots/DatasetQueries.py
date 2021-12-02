@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import random
 import librosa
 import IPython.display as ipd
@@ -50,7 +50,8 @@ def return_similar_genres(genre: str, genre_df: pd.DataFrame, track_df: pd.DataF
     return most_similar_genres_list
 
 
-def return_most_popular_song(genre: str, genre_df: pd.DataFrame, track_df: pd.DataFrame) -> List[str]:
+def return_most_popular_song(genre: str, genre_df: pd.DataFrame, track_df: pd.DataFrame) -> \
+        Tuple[List[str], List[str], List[str]]:
     """
     Return most popular song in a genre according to track listens.  More than one song can be returned if multiple
     songs have the same number of listens.
@@ -74,14 +75,20 @@ def return_most_popular_song(genre: str, genre_df: pd.DataFrame, track_df: pd.Da
 
     tracks_in_genre_df = track_df[track_df['track_genres'].apply(lambda x: any([genre_id in x]))]
 
-    most_popular_songs = tracks_in_genre_df[tracks_in_genre_df['track_listens'] ==
-                                            max(tracks_in_genre_df['track_listens'])]['track_title'].to_list()
+    songs_info = tracks_in_genre_df[tracks_in_genre_df['track_listens'] ==
+                                    max(tracks_in_genre_df['track_listens'])][['track_title',
+                                                                               'artist_name',
+                                                                               'album_title']]
 
-    return most_popular_songs
+    most_popular_songs = songs_info['track_title'].to_list()
+    artists = songs_info['artist_name'].to_list()
+    albums = songs_info['album_title'].to_list()
+
+    return most_popular_songs, artists, albums
 
 
 def play_random_song_from_genre(genre: str, genre_df: pd.DataFrame, track_df: pd.DataFrame, path_df: pd.DataFrame) -> \
-        Optional[ipd.Audio]:
+        Optional[Tuple[ipd.Audio, str, str, str]]:
     """
     Play a random song from a given genre.
 
@@ -96,6 +103,9 @@ def play_random_song_from_genre(genre: str, genre_df: pd.DataFrame, track_df: pd
     """
     y = None
     sr = None
+    song_title = "NA"
+    artist_name = "NA"
+    album_title = "NA"
 
     genre_id = genre_df[genre_df['title'].apply(
         lambda x: x.lower().replace("-", "").replace(" ", "") == genre.lower().replace("-", "").replace(" ", ""))][
@@ -129,6 +139,12 @@ def play_random_song_from_genre(genre: str, genre_df: pd.DataFrame, track_df: pd
             except (RuntimeError, audioread.NoBackendError):
                 continue
 
+            song_info = track_df[track_df['track_id'] == song_ids[rand_int]][['track_title',
+                                                                              'artist_name', 'album_title']]
+            song_title = song_info['track_title'].item()
+            artist_name = song_info['artist_name'].item()
+            album_title = song_info['album_title'].item()
+
             status = True
 
         if max_lookups > 10:
@@ -137,7 +153,7 @@ def play_random_song_from_genre(genre: str, genre_df: pd.DataFrame, track_df: pd
 
         max_lookups += 1
 
-    return ipd.Audio(data=y, rate=sr)
+    return ipd.Audio(data=y, rate=sr), song_title, artist_name, album_title
 
 
 def play_song_from_title(title: str, track_df: pd.DataFrame, path_df: pd.DataFrame) -> Optional[ipd.Audio]:
@@ -153,8 +169,6 @@ def play_song_from_title(title: str, track_df: pd.DataFrame, path_df: pd.DataFra
         (Optional[ipd.Audio]): Interactive playable file of song by the specified title.
 
     """
-    y = None
-    sr = None
 
     song_ids = track_df[track_df['track_title'] == title]
 
@@ -192,6 +206,7 @@ def play_song_from_title(title: str, track_df: pd.DataFrame, path_df: pd.DataFra
     else:
         print('Audio file could not be found.')
         return None
+
 
 def play_song_from_filename(filename: str) -> Optional[ipd.Audio]:
     """
