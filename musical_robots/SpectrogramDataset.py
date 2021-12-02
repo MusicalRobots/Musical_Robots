@@ -244,7 +244,20 @@ def create_dataframes(file_paths_path: str, tracks_csv_path: str, genre_csv_path
 
     return file_path_df, track_df, relevant_genre_df, genre_df
 
-def split_data(file_path_df, test_percentage, validation_percentage):
+def split_data(file_path_df: pd.DataFrame, test_percentage: pd.DataFrame, validation_percentage: pd.DataFrame):
+    """
+        Splits data into 3 datasets for training, testing and validation
+
+        Args:
+            file_path_df: (pd.DataFrame) Dataframe storing the data paths for each sound file.
+            test_percentage: (float) Percentage of paths to designate as part of the test dataset.
+            validation_percentage: (float) Percentage of paths to designate as part of the validation dataset.
+
+        Returns:
+            train_paths: (pd.DataFrame) paths of data for the training set
+            testing_paths: (pd.DataFrame) paths of data for the testing set
+            validation_paths: (pd.DataFrame) paths of data for the validation set
+    """
     train_paths, test_paths = train_test_split(file_path_df, test_size=test_percentage)
     train_paths, validation_paths = train_test_split(train_paths, test_size=validation_percentage)
 
