@@ -8,13 +8,14 @@ import librosa
 import librosa.display
 
 from SpectrogramDataset import create_dataframes, AudioFeature, split_data
+from SVMPrediction import svm_prediction
+from DatasetQueries import return_similar_genres, return_most_popular_song
 
 
 class Tests(unittest.TestCase):
     """
     Test class for Musical Robots
     """
-
     def test_load(self):
         """ Test checks if files can load. """
         # check that the data can load, (getting an error in Windows)
@@ -35,6 +36,7 @@ class Tests(unittest.TestCase):
                           tracks_csv_path='data/fma_metadata/tracks_short.csv',
                           genre_csv_path='data/fma_metadata/genres.csv')
         assert len(output)==4
+
 
     def test_split(self):
         """ test that the splitting function is working right"""
@@ -58,6 +60,45 @@ class Tests(unittest.TestCase):
             genre_csv_path='data/fma_metadata/genres.csv')
         #make 1 Audio data class
         train_data = AudioFeature(file_path_df, track_df, genre_df)
+
+    def test_prediction(self):
+        """ Smoke test to see if svm prediction works
+        """
+        file_path_df, track_df, relevant_genre_df, genre_df= create_dataframes(
+            file_paths_path='data/all_data_path_short.txt',
+            tracks_csv_path='data/fma_metadata/tracks_short.csv',
+            genre_csv_path='data/fma_metadata/genres.csv')
+
+        file = file_path_df.iloc[0]['file_path']
+        filename = 'data/fma_small/' + file
+
+        genre = svm_prediction(filename, genre_df)
+
+
+    def test_data_queries(self):
+        """
+            Smoke tests to test functions of data queries
+        """
+        file_path_df, track_df, relevant_genre_df, genre_df= create_dataframes(
+            file_paths_path='data/all_data_path_short.txt',
+            tracks_csv_path='data/fma_metadata/tracks_short.csv',
+            genre_csv_path='data/fma_metadata/genres.csv')
+
+        file = file_path_df.iloc[0]['file_path']
+        filename = 'data/fma_small/' + file
+
+        genre = svm_prediction(filename, genre_df)
+        print('The predicted genre is: ', genre)
+
+        k = 10
+        similar_genres = return_similar_genres(genre, genre_df, track_df, k)
+        print('The most similar genres to ', genre, ' are : ', similar_genres)
+        assert len(similar_genres) < k
+
+        most_popular_song = return_most_popular_song(genre, genre_df, track_df)
+        assert len(most_popular_song) == 1
+
+
 
 
 
