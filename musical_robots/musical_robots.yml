@@ -1,0 +1,14 @@
+name: musical-robots
+
+channels:
+  -pytorch
+dependencies:
+  - python
+  - pytorch
+  - numpy
+  - pandas
+  - scikit-learn
+  - numpy
+  - pip:
+      - ipython
+      - librosa
