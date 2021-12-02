@@ -16,6 +16,9 @@ class Tests(unittest.TestCase):
     """
     Test class for Musical Robots
     """
+    def test_fail(self):
+        dfghjk
+        
     def test_load(self):
         """ Test checks if files can load. """
         # check that the data can load, (getting an error in Windows)
