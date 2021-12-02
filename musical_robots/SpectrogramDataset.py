@@ -244,6 +244,11 @@ def create_dataframes(file_paths_path: str, tracks_csv_path: str, genre_csv_path
 
     return file_path_df, track_df, relevant_genre_df, genre_df
 
+def split_data(file_path_df, test_percentage, validation_percentage):
+    train_paths, test_paths = train_test_split(file_path_df, test_size=test_percentage)
+    train_paths, validation_paths = train_test_split(train_paths, test_size=validation_percentage)
+
+    return train_paths, test_paths, validation_paths
 
 def create_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFrame, genre_df: pd.DataFrame,
                    test_percentage: float = .10,
@@ -264,8 +269,9 @@ def create_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFrame, genre_df:
         test_data: (Dataset) Dataset containing testing music data as spectrograms and genre labels.
     """
 
-    train_paths, test_paths = train_test_split(file_path_df, test_size=test_percentage)
-    train_paths, validation_paths = train_test_split(train_paths, test_size=validation_percentage)
+    # train_paths, test_paths = train_test_split(file_path_df, test_size=test_percentage)
+    # train_paths, validation_paths = train_test_split(train_paths, test_size=validation_percentage)
+    train_paths, test_paths, validation_paths = split_data(file_path_df, test_percentage, validation_percentage)
 
     train_data = SpectrogramDataset(train_paths, track_df, genre_df)
 

@@ -7,7 +7,7 @@ import pandas as pd
 import librosa
 import librosa.display
 
-from SpectrogramDataset import create_dataframes, AudioFeature#, #train_validate_test_split
+from SpectrogramDataset import create_dataframes, AudioFeature, split_data#train_validate_test_split
 
 
 class Tests(unittest.TestCase):
@@ -31,22 +31,24 @@ class Tests(unittest.TestCase):
         """ Test making a dataframe with a very shorted version of the data
         """
 
-        create_dataframes(file_paths_path='data/all_data_path_short.txt',
+        output = create_dataframes(file_paths_path='data/all_data_path_short.txt',
                           tracks_csv_path='data/fma_metadata/tracks_short.csv',
                           genre_csv_path='data/fma_metadata/genres.csv')
+        assert len(output)==4
 
-    # def test_split(self):
-    #     """ test that the splitting function is working right"""
-    #     file_path_df, track_df, genre_df = create_dataframes(
-    #         file_paths_path='data/all_data_path_short.txt',
-    #         tracks_csv_path='data/fma_metadata/tracks_short.csv',
-    #         genre_csv_path='data/fma_metadata/genres.csv')
-    #
-    #     #check that splitting is working right
-    #     train, validate, test = train_validate_test_split(file_path_df, 0.2, 0.2)
-    #     assert len(train) == 3
-    #     assert len(validate) == 1
-    #     assert len(test) == 1
+    def test_split(self):
+        """ test that the splitting function is working right"""
+        file_path_df, track_df, relevant_genre_df, genre_df = create_dataframes(
+            file_paths_path='data/all_data_path_short.txt',
+            tracks_csv_path='data/fma_metadata/tracks_short.csv',
+            genre_csv_path='data/fma_metadata/genres.csv')
+
+        #check that splitting is working right
+        # train, validate, test = train_validate_test_split(file_path_df, 0.2, 0.2)
+        train, test, validate = split_data(file_path_df, 0.2, 0.2)
+        assert len(train) == 3
+        assert len(validate) == 1
+        assert len(test) == 1
 
     def test_audio_feature(self):
         """ Test making an audio feature object """
