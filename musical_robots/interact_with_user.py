@@ -1,17 +1,14 @@
 import numpy as np
 import pandas as pd
-import scipy
 import ipywidgets as widgets
-import IPython.display as ipd
-import os
 import librosa
 import warnings
 import audioread
+import ast
 
 from DatasetQueries import *
 from SVMPrediction import svm_prediction
 from SpectrogramDataset import SpectrogramDataset, MfccDataset, AudioFeature, create_audio_feature_dataset, create_mfcc_dataset, create_dataframes, create_dataset
-from ipywidgets import interact, interact_manual
 from IPython.display import Image, display, HTML, Audio, clear_output
 
 class Interactive:
@@ -94,17 +91,15 @@ class Interactive:
         b4 = widgets.Button(description='Yes', layout=widgets.Layout(width='30%'))
         b5 = widgets.Button(description='No', layout=widgets.Layout(width='30%'))
         
-        ##  this part was edited so that instead of calling the create_dataframes method from SpectorgrmaDataset, directing read the csv files in data folder: file_path_df, track_df, genre_df and total_genre_df
+        file_path_df=pd.read_csv('./data/file_path_df',index_col=0)
+        track_df=pd.read_csv('./data/track_df',index_col=0)
+        genre_df=pd.read_csv('./data/genre_df',index_col=0)
+        total_genre_df=pd.read_csv('./data/total_genre_df',index_col=0)
+        def filter(row):
+            return [int(i) for i in ast.literal_eval(row['track_genres'])]
+        track_df['track_genres'] = track_df.apply(filter, axis=1)
         
-        file_path_df=pd.read_csv('./data/file_path_df')
-        track_df=pd.read_csv('./data/track_df')
-        genre_df=pd.read_csv('./data/genre_df')
-        total_genre_df=pd.read_csv('./data/total_genre_df')
-        
-        ##
-        
-        # before edited: file_path_df, track_df, genre_df, total_genre_df = create_dataframes(file_paths_path = 'data/all_data_paths.txt' ,tracks_csv_path = 'data/fma_metadata/tracks.csv',genre_csv_path = 'data/fma_metadata/genres.csv')        
-
+    
         genre = svm_prediction(uploaded_filename, genre_df)
         
         display(HTML('<h2>The genre is ...{}<h2>'.format(genre)))
@@ -115,13 +110,13 @@ class Interactive:
 
 
         def yes_similiar_songs(b4):
-            """if the users choose yes, display the most popular song and the most similar genres"""
+            """if the users choose yes, display the most popular songs and the most similar genres"""
             
             output.clear_output(wait=True)
             clear_output(wait=False)
             
             most_popular_song = return_most_popular_song(genre = genre, genre_df = total_genre_df, track_df=track_df)
-            display(HTML('<h3>The most popular song in the genre {} is {} <h3>'.format(genre, most_popular_song)))
+            display(HTML('<h3>The most popular songs in the genre {} are {} <h3>'.format(genre, most_popular_song)))
             similar_genres = return_similar_genres(genre = genre, genre_df = total_genre_df, track_df= track_df, k= 10) 
             display(HTML('<h3>The most similar genres to {} are : {} <h3><br>'.format(genre, similar_genres)))
             display(HTML("<h2>Hope it's helpful ! Thank you !<h2>"))
