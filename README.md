@@ -21,3 +21,6 @@ A project that helps to identify the genre of an mp3 music file and discover oth
 
 ## Contributors
 Olga Dorabiala, Katie Johnston, Raphael Liu, Amre Abken.
+
+## Acknowledgements
+Thanks to Prof. David Beck and Anant Mittal at the University of Washington for teaching the course and guiding us during the execution of this project. 
