@@ -17,10 +17,5 @@ A project that helps to identify the genre of an mp3 music file and discover oth
 4) To run the unit tests, use `python -m unittest -c tests`  at the /musical_robots/ directory.
 5) To check out a Neural Networks approach for training the model, please open 'musical_robots/TrainANetwork.ipynb'.
 
-
-
-## Contributors
-Olga Dorabiala, Katie Johnston, Raphael Liu, Amre Abken.
-
 ## Acknowledgements
 Thanks to Prof. David Beck and Anant Mittal at the University of Washington for teaching the course and guiding us during the execution of this project. 
