@@ -36,9 +36,7 @@ class AudioFeature:
         self.samples = []
 
         for row in path_df.itertuples():
-            # filename = "data/fma_small/" + row[1]
             filename = path_to_data + row[1]
-
 
             try:
                 y_audio, sample_rate = librosa.load(
@@ -189,23 +187,24 @@ def split_data(
         as part of the validation dataset.
 
     Returns:
-        train_paths: (pd.DataFrame) paths of data for the training set
-        testing_paths: (pd.DataFrame) paths of data for the testing set
-        validation_paths: (pd.DataFrame) paths of data for the validation set
+        train_df: (pd.DataFrame) DataFrame of data for the training set
+        test_df: (pd.DataFrame) Dataframe of data for the testing set
+        validation_df: (pd.DataFrame) Dataframe of data for the validation set
     """
-    train_paths, test_paths = train_test_split(
+    train_df, test_df = train_test_split(
         file_path_df, test_size=test_percentage)
-    train_paths, validation_paths = train_test_split(
-        train_paths, test_size=validation_percentage
+    train_df, validation_df = train_test_split(
+        train_df, test_size=validation_percentage
     )
 
-    return train_paths, test_paths, validation_paths
+    return train_df, test_df, validation_df
 
 
 def create_audio_feature_dataset(
     file_path_df: pd.DataFrame,
     track_df: pd.DataFrame,
     genre_df: pd.DataFrame,
+    path_to_data: str = "data/fma_small/",
     test_percentage: float = 0.10,
     validation_percentage: float = 0.10,
 ) -> Tuple[AudioFeature, AudioFeature, AudioFeature]:
@@ -230,30 +229,35 @@ def create_audio_feature_dataset(
         test_data: (Dataset) Dataset containing testing music data as
         spectrograms and genre labels.
     """
-    train_paths, test_paths, validation_paths = split_data(
+    train_df, test_df, validation_df = split_data(
         file_path_df=file_path_df,
         test_percentage=test_percentage,
         validation_percentage=validation_percentage,
     )
     print("Starting making train_data")
     train_data = AudioFeature(
-        train_paths,
-        track_df,
-        genre_df,
+        path_to_data=path_to_data,
+        path_df=train_df,
+        music_df=track_df,
+        genre_df=genre_df,
     )
 
     print("Training dataset created.")
 
     validation_data = AudioFeature(
-        validation_paths,
-        track_df,
-        genre_df
+        path_to_data=path_to_data,
+        path_df=validation_df,
+        music_df=track_df,
+        genre_df=genre_df
     )
 
     print("Validation dataset created.")
 
     test_data = AudioFeature(
-        test_paths, track_df, genre_df
+        path_to_data=path_to_data,
+        path_df=test_df,
+        music_df=track_df,
+        genre_df=genre_df
     )
 
     print("Test dataset created.")

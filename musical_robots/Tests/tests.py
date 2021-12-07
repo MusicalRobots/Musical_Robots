@@ -9,6 +9,7 @@ from musical_robots.spectrogram_dataset import create_dataframes, AudioFeature, 
 from musical_robots.svm_prediction import svm_prediction
 from musical_robots.dataset_queries import return_similar_genres, return_most_popular_song
 
+import warnings
 
 class Tests(unittest.TestCase):
     """
@@ -20,12 +21,14 @@ class Tests(unittest.TestCase):
             Test that we can create a dataframe and then save results for
             other tests
         """
+
+        warnings.filterwarnings("ignore")
+
         output = create_dataframes(file_paths_path='musical_robots/data/all_data_path_short.txt',
                                    tracks_csv_path='musical_robots/data/fma_metadata/tracks_short.csv',
                                    genre_csv_path='musical_robots/data/fma_metadata/genres.csv')
         assert len(output) == 4
         cls.file_path_df, cls.track_df, cls.relevant_genre_df, cls.genre_df = output
-
 
     # def test_make_spectrogram_dataset(self):
     #     """ Test making a dataframe with a very shorted version of the data
@@ -58,7 +61,10 @@ class Tests(unittest.TestCase):
             Smoke test to test the creation of an audio feature dataset
         """
 
-        create_audio_feature_dataset(self.file_path_df, self.track_df, self.genre_df,
+        create_audio_feature_dataset("musical_robots/data/fma_small/",
+                                     self.file_path_df,
+                                     self.track_df,
+                                     self.genre_df,
                                      test_percentage=0.2,
                                      validation_percentage=0.2)
 
@@ -74,7 +80,7 @@ class Tests(unittest.TestCase):
         """
 
         file = self.file_path_df.iloc[0]['file_path']
-        filename = 'data/fma_small/' + file
+        filename = "musical_robots/data/fma_small/" + file
 
         genre = svm_prediction(filename, self.genre_df,
                                model_filename='musical_robots/svm_model.pkl')
