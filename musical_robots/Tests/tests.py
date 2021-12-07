@@ -80,9 +80,6 @@ class Tests(unittest.TestCase):
         genre = svm_prediction(filename, self.genre_df,
                                model_filename='musical_robots/svm_model.pkl')
 
-        print("Genre = ", genre)
-
-        assert isinstance(genre, str)
 
 
     def test_similar_genres(self):
@@ -102,7 +99,17 @@ class Tests(unittest.TestCase):
             Test to check that fake genre throws an exception
         """
         with self.assertRaises(Exception):
-            similar_genres = return_similar_genres('foo', self.genre_df, self.track_df, k=10)
+            return_similar_genres('foo', self.genre_df, self.track_df, k=10)
+
+    def test_similar_genres_k_outofrange(self):
+        """
+            Test to check that fake genre throws an exception
+        """
+        with self.assertRaises(Exception):
+            #when k is too small
+            return_similar_genres('foo', self.genre_df, self.track_df, k=0)
+            #when k is too big
+            return_similar_genres('foo', self.genre_df, self.track_df, k=11)
 
     def test_most_pop(self):
         """
@@ -112,7 +119,7 @@ class Tests(unittest.TestCase):
 
         # genre = svm_prediction(filename, self.genre_df)
 
-        most_popular_song = return_most_popular_song('pop', self.genre_df, self.track_df)
+        return_most_popular_song('pop', self.genre_df, self.track_df)
         # assert len(most_popular_song) == 1
 
 
