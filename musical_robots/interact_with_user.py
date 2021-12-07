@@ -236,7 +236,8 @@ class Interactive:
                     options=self.most_similar_genres,
                     rows=np.size(self.most_similar_genres),
                     description='genres:',
-                    disabled=False)
+                    disabled=False
+                    value=None)
             def play_random_song_from_selected_genre(change):
                 output.clear_output(wait=False)
                 clear_output(wait=False)

@@ -147,7 +147,7 @@ def play_random_song_from_genre(genre: str, genre_df: pd.DataFrame, track_df: pd
 
             status = True
 
-        if max_lookups > 10:
+        if max_lookups > 20:
             print('Could not find song in genre.')
             return None
 
