@@ -7,7 +7,7 @@ import pandas as pd
 import librosa
 import librosa.display
 
-from SpectrogramDataset import create_dataframes, AudioFeature, split_data
+from SpectrogramDataset import create_dataframes, AudioFeature, split_data, create_audio_feature_dataset
 from SVMPrediction import svm_prediction
 from dataset_queries import return_similar_genres, return_most_popular_song
 
@@ -27,6 +27,15 @@ class Tests(unittest.TestCase):
                                    genre_csv_path='data/fma_metadata/genres.csv')
         assert len(output) == 4
 
+    def test_all_loaded(self):
+        """ Test making a dataframe with a very shorted version of the data
+        """
+
+        file_path_df, track_df, relevant_genre_df, genre_df = create_dataframes(file_paths_path='data/all_data_path_short.txt',
+                                   tracks_csv_path='data/fma_metadata/tracks_short.csv',
+                                   genre_csv_path='data/fma_metadata/genres.csv')
+        assert len(file_path_df) == len(track_df)
+
 
     def test_split(self):
         """ test that the splitting function is working right"""
@@ -41,6 +50,20 @@ class Tests(unittest.TestCase):
         assert len(train) == 3
         assert len(validate) == 1
         assert len(test) == 1
+
+    def test_audio_feature_dataset(self):
+        """
+            Smoke test to test the creation of an audio feature dataset
+        """
+        file_path_df, track_df, relevant_genre_df, genre_df = create_dataframes(
+            file_paths_path='data/all_data_path_short.txt',
+            tracks_csv_path='data/fma_metadata/tracks_short.csv',
+            genre_csv_path='data/fma_metadata/genres.csv')
+        create_audio_feature_dataset(file_path_df, track_df, genre_df,
+                                     test_percentage=0.2,
+                                     validation_percentage=0.2)
+
+
 
     def test_audio_feature(self):
         """ Test making an audio feature object """
