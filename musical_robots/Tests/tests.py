@@ -48,9 +48,6 @@ class Tests(unittest.TestCase):
 
     def test_split(self):
         """ test that the splitting function is working right"""
-
-        #check that splitting is working right
-        # train, validate, test = train_validate_test_split(file_path_df, 0.2, 0.2)
         train, test, validate = split_data(self.file_path_df, 0.2, 0.2)
         assert len(train) == 3
         assert len(validate) == 1
@@ -61,13 +58,12 @@ class Tests(unittest.TestCase):
             Smoke test to test the creation of an audio feature dataset
         """
 
-        create_audio_feature_dataset("musical_robots/data/fma_small/",
-                                     self.file_path_df,
+        create_audio_feature_dataset(self.file_path_df,
                                      self.track_df,
                                      self.genre_df,
+                                     path_to_data="musical_robots/data/fma_small/",
                                      test_percentage=0.2,
                                      validation_percentage=0.2)
-
 
     def test_audio_feature(self):
         """ Test making an audio feature object """

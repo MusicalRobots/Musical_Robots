@@ -25,6 +25,7 @@ class AudioFeature:
         Create list of data tuples.
 
         Args:
+            path_to_data: (str)
             path_df: (pd.Dataframe) DataFrame containing file paths.
             music_df: (pd.DataFrame) Dataframe containing music information.
             genre_df: (pd.DataFrame) Dataframe containing genre information.
@@ -193,10 +194,10 @@ def split_data(
     """
     train_df, test_df = train_test_split(
         file_path_df, test_size=test_percentage)
+
     train_df, validation_df = train_test_split(
         train_df, test_size=validation_percentage
     )
-
     return train_df, test_df, validation_df
 
 
@@ -222,18 +223,20 @@ def create_audio_feature_dataset(
         as part of the validation dataset.
 
     Returns:
-        train_data: (Dataset) Dataset containing training music data as
+        train_data: (AudioFeature) Dataset containing training music data as
         spectrograms and genre labels.
-        validation_data: (Dataset) Dataset containing validation music
+        validation_data: (AudioFeature) Dataset containing validation music
         data as spectrograms and genre labels.
-        test_data: (Dataset) Dataset containing testing music data as
+        test_data: (AudioFeature) Dataset containing testing music data as
         spectrograms and genre labels.
     """
+
     train_df, test_df, validation_df = split_data(
         file_path_df=file_path_df,
         test_percentage=test_percentage,
         validation_percentage=validation_percentage,
     )
+
     print("Starting making train_data")
     train_data = AudioFeature(
         path_to_data=path_to_data,
