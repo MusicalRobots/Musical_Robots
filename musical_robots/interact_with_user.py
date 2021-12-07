@@ -6,7 +6,7 @@ import ast
 
 import pandas as pd
 
-from DatasetQueries import *
+from dataset_queries import *
 from SVMPrediction import svm_prediction
 from IPython.display import display, HTML, clear_output
 
