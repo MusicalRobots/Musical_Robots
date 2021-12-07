@@ -162,7 +162,7 @@ class Interactive:
             display(HTML('<h3>The most similar genres to {} are : {} <h3>'.format(genre,
                                                                                   ', '.join(self.most_similar_genres))))
 
-            display(HTML('<h3 Would you like to hear the most popular song {} <h3><br>'.format(self.most_popular_song)))
+            display(HTML('<h3> Would you like to hear the most popular song {} <h3><br>'.format(self.most_popular_song)))
 
             b6 = widgets.Button(description='Yes', layout=widgets.Layout(width='30%'))
             b7 = widgets.Button(description='No', layout=widgets.Layout(width='30%'))
@@ -232,28 +232,39 @@ class Interactive:
             display(HTML('<h2>Which genre would you like to hear a '
                          'random song from: {} ?<h2>'.format(', '.join(self.most_similar_genres))))
 
-            input_genre = input("Enter genre:")
-
-            random_song = play_random_song_from_genre(genre=input_genre,genre_df=genre_df,
+            s1=widgets.Select(
+                    options=self.most_similar_genres,
+                    rows=np.size(self.most_similar_genres),
+                    description='genres:',
+                    disabled=False,
+                    value=None)
+            def play_random_song_from_selected_genre(change):
+                output.clear_output(wait=False)
+                clear_output(wait=False)
+                
+                random_song = play_random_song_from_genre(genre=s1.value,genre_df=total_genre_df,
                                                            track_df=track_df, path_df=file_path_df)
 
-            if random_song is not None:
-                display(HTML('<h2> Playing song {} by {} from {} .<h2>'.format(random_song[1],
-                                                                               random_song[2],
-                                                                               random_song[3])))
-                display(random_song[0])
+                if random_song is not None:
+                    display(HTML('<h2> Playing song {} by {} from {} .<h2>'.format(random_song[1],
+                                                                                   random_song[2],
+                                                                                   random_song[3])))
+                    display(random_song[0])
 
-            else:
-                display(HTML('<h2> Sorry, could not find a song from {}.<h2>'.format(input_genre)))
+                else:
+                    display(HTML('<h2> Sorry, could not find a song from {}.<h2>'.format(input_genre)))
 
-            b9 = widgets.Button(description='Play another random song?', layout=widgets.Layout(width='30%'))
-            b10 = widgets.Button(description='No.', layout=widgets.Layout(width='30%'))
+                b9 = widgets.Button(description='Play another random song?', layout=widgets.Layout(width='30%'))
+                b10 = widgets.Button(description='No.', layout=widgets.Layout(width='30%'))
 
-            h4 = widgets.HBox([b9, b10])
-            display(h4, output)
+                h4 = widgets.HBox([b9, b10])
+                display(h4, output)
 
-            b9.on_click(yes_play_random_song_from_genre)
-            b10.on_click(no_dont_play_random_song_from_genre)
+                b9.on_click(yes_play_random_song_from_genre)
+                b10.on_click(no_dont_play_random_song_from_genre)
+            
+            display(s1,output)
+            s1.observe(play_random_song_from_selected_genre,names='value')
 
         def no_dont_play_random_song_from_genre(b: widgets.Button):
             output.clear_output(wait=True)

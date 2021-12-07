@@ -244,7 +244,7 @@ def create_dataframes(file_paths_path: str, tracks_csv_path: str, genre_csv_path
 
     return file_path_df, track_df, relevant_genre_df, genre_df
 
-def split_data(file_path_df: pd.DataFrame, test_percentage: pd.DataFrame, validation_percentage: pd.DataFrame):
+def split_data(file_path_df: pd.DataFrame, test_percentage: float, validation_percentage: float):
     """
         Splits data into 3 datasets for training, testing and validation
 
@@ -372,25 +372,5 @@ def create_audio_feature_dataset(file_path_df: pd.DataFrame, track_df: pd.DataFr
     test_data = AudioFeature(test_paths, track_df, genre_df, limit_samples=limit_samples, max_samples=10)
 
     print('Test dataset created.')
-
-    return train_data, validation_data, test_data
-
-def load_audio_feature_dataset(train_samples_file, val_sample_file, test_sample_file):
-    """
-    Loads the custom dataset given the locations of the data.
-
-    Args:
-        ###ADD###
-
-    Returns:
-        train_data: (Dataset) Dataset containing training music data as spectrograms and genre labels.
-        validation_data: (Dataset) Dataset containing validation music data as spectrograms and genre labels.
-        test_data: (Dataset) Dataset containing testing music data as spectrograms and genre labels.
-    """
-
-    print("loading datasets")
-    train_data = AudioFeature(samples = np.load(train_samples_file, allow_pickle = True))
-    validation_data = AudioFeature(samples = np.load(val_sample_file, allow_pickle = True))
-    test_data = AudioFeature(samples = np.load(test_sample_file, allow_pickle = True))
 
     return train_data, validation_data, test_data
