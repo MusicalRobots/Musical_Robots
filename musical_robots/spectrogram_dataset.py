@@ -20,8 +20,6 @@ class AudioFeature:
         path_df: pd.DataFrame = None,
         music_df: pd.DataFrame = None,
         genre_df: pd.DataFrame = None,
-        limit_samples=False,
-        max_samples=100,
     ) -> None:
         """
         Create list of data tuples.
@@ -208,8 +206,6 @@ def create_audio_feature_dataset(
     genre_df: pd.DataFrame,
     test_percentage: float = 0.10,
     validation_percentage: float = 0.10,
-    limit_samples: bool = False,
-    max_samples: int = 100,
 ) -> Tuple[AudioFeature, AudioFeature, AudioFeature]:
     """
     Create the custom dataset given the locations of the data.
@@ -223,9 +219,6 @@ def create_audio_feature_dataset(
         part of the test dataset.
         validation_percentage: (float) Percentage of paths to designate
         as part of the validation dataset.
-        limit_samples (bool) Whether or not to limit the number of
-        samples generated.
-        max_samples (int) Max number of samples to include in the dataset.
 
     Returns:
         train_data: (Dataset) Dataset containing training music data as
@@ -245,8 +238,6 @@ def create_audio_feature_dataset(
         train_paths,
         track_df,
         genre_df,
-        limit_samples=limit_samples,
-        max_samples=max_samples,
     )
 
     print("Training dataset created.")
@@ -254,16 +245,13 @@ def create_audio_feature_dataset(
     validation_data = AudioFeature(
         validation_paths,
         track_df,
-        genre_df,
-        limit_samples=limit_samples,
-        max_samples=10,
+        genre_df
     )
 
     print("Validation dataset created.")
 
     test_data = AudioFeature(
-        test_paths, track_df, genre_df,
-        limit_samples=limit_samples, max_samples=10
+        test_paths, track_df, genre_df
     )
 
     print("Test dataset created.")
