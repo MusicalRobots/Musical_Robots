@@ -7,8 +7,8 @@ import pandas as pd
 import librosa
 import librosa.display
 
-from SpectrogramDataset import create_dataframes, AudioFeature, split_data
-from SVMPrediction import svm_prediction
+from spectrogram_dataset import create_dataframes, AudioFeature, split_data
+from svm_prediction import svm_prediction
 from DatasetQueries import return_similar_genres, return_most_popular_song
 
 
