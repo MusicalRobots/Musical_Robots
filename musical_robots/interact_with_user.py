@@ -9,9 +9,9 @@ import IPython.display as ipd
 import pandas as pd
 import numpy as np
 
-from musical_robots.dataset_queries import return_similar_genres, return_most_popular_song, \
+from dataset_queries import return_similar_genres, return_most_popular_song, \
     play_random_song_from_genre, play_song_from_filename
-from musical_robots.svm_prediction import svm_prediction
+from svm_prediction import svm_prediction
 from IPython.display import display, HTML, clear_output
 
 from typing import Tuple, List
