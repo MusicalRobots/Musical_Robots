@@ -15,7 +15,8 @@ def svm_prediction(filename: str, genre_df: pd.DataFrame,
 
     Args:
        filename (str): path to music mp3 file
-       genre_df: (pd.DataFrame) Dataframe containing genre information.
+       genre_df (pd.DataFrame): Dataframe containing genre information.
+       model_filename (str): path to the model file. default is "svm_model.pkl"
     Returns:
         genre (str): predicted genre of the mp3 file
     """
