@@ -14,7 +14,7 @@ A project that helps to identify the genre of an mp3 music file and discover oth
 3) To replicate the ML model:  
 			- Download the training dataset 'fma_small.zip' at the https://github.com/mdeff/fma.  
 			- Open the 'musical_robots/SVMPrediction.py'
-4) To run the unit tests, use `python -m unittest -c tests`  at the /musical_robots/ directory.
+4) To run the unit tests, use `python -m unittest discover -s musical_robots`  in the main directory.
 5) To check out a Neural Networks approach for training the model, please open 'musical_robots/TrainANetwork.ipynb'.
 
 ## Acknowledgements
