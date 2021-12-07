@@ -8,7 +8,8 @@ import librosa
 import audioread
 
 
-def svm_prediction(filename: str, genre_df: pd.DataFrame) -> Optional[str]:
+def svm_prediction(filename: str, genre_df: pd.DataFrame,
+                   model_filename: str = "svm_model.pkl") -> Optional[str]:
     """
     Return SVM prediction of genre from an audio file.
 
@@ -50,7 +51,7 @@ def svm_prediction(filename: str, genre_df: pd.DataFrame) -> Optional[str]:
         ]
     )
 
-    with open("svm_model.pkl", "rb") as file:
+    with open(model_filename, "rb") as file:
         clf = pickle.load(file)
 
     label = clf.predict(test_data_array)
