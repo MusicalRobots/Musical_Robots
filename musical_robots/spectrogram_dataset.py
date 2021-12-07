@@ -16,7 +16,7 @@ class AudioFeature:
     """Create custom dataset of spectrograms and genre labels."""
 
     def __init__(
-        self,
+        self, path_to_data="data/fma_small/",
         path_df: pd.DataFrame = None,
         music_df: pd.DataFrame = None,
         genre_df: pd.DataFrame = None,
@@ -36,7 +36,9 @@ class AudioFeature:
         self.samples = []
 
         for row in path_df.itertuples():
-            filename = "data/fma_small/" + row[1]
+            # filename = "data/fma_small/" + row[1]
+            filename = path_to_data + row[1]
+
 
             try:
                 y_audio, sample_rate = librosa.load(

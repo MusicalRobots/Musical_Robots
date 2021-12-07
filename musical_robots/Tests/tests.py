@@ -4,10 +4,10 @@ Tests for Musical Robots
 """
 import unittest
 
-from spectrogram_dataset import create_dataframes, AudioFeature, split_data, \
+from musical_robots.spectrogram_dataset import create_dataframes, AudioFeature, split_data, \
                                create_audio_feature_dataset
-from svm_prediction import svm_prediction
-from dataset_queries import return_similar_genres, return_most_popular_song
+from musical_robots.svm_prediction import svm_prediction
+from musical_robots.dataset_queries import return_similar_genres, return_most_popular_song
 
 
 class Tests(unittest.TestCase):
@@ -63,12 +63,11 @@ class Tests(unittest.TestCase):
                                      validation_percentage=0.2)
 
 
-
     def test_audio_feature(self):
         """ Test making an audio feature object """
 
         #make 1 Audio data class
-        AudioFeature(self.file_path_df, self.track_df, self.genre_df)
+        AudioFeature("musical_robots/data/fma_small/", self.file_path_df, self.track_df, self.genre_df)
 
     def test_prediction(self):
         """ Smoke test to see if svm prediction works

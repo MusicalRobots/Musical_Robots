@@ -6,4 +6,4 @@ from .dataset_queries import return_similar_genres, return_most_popular_song
 # from .DatasetQueries import *
 # from .SVMPrediction import *
 # from .SpectrogramDataset import *
-# from .interact_with_user import *
+from .interact_with_user import *
