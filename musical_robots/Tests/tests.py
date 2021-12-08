@@ -162,6 +162,6 @@ class Tests(unittest.TestCase):
         self.assertIsNone(audio)
 
     def test_play_song_from_filename_audioread(self):
-        filename = 'musical_robots/data/fma_small/108/108925.mp3'
+        filename = 'musical_robots/data/fma_small108/108925.mp3'
         audio = play_song_from_filename(filename)
         self.assertIsNone(audio)
