@@ -253,7 +253,8 @@ def play_song_from_filename(filename: str) -> Optional[ipd.Audio]:
     return audio
 
 # def play_song_from_title(
-#     title: str, track_df: pd.DataFrame, path_df: pd.DataFrame, path_to_data: str = 'data/fma_small/'
+#     title: str, track_df: pd.DataFrame, path_df: pd.DataFrame,
+#     path_to_data: str = 'data/fma_small/'
 # ) -> Optional[ipd.Audio]:
 #     """
 #     Play a song from its title.
@@ -307,4 +308,5 @@ def play_song_from_filename(filename: str) -> Optional[ipd.Audio]:
 #         print("Audio file could not be found.")
 #
 #     return audio
+
 

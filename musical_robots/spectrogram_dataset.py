@@ -42,8 +42,8 @@ class AudioFeature:
             try:
                 y_audio, sample_rate = librosa.load(
                     filename, sr=None, mono=True)
-            except (RuntimeError, audioread.NoBackendError) as e:
-                print("Failed to load ", filename, e)
+            except (RuntimeError, audioread.NoBackendError):
+                print("Failed to load ", filename)
                 continue
             except FileNotFoundError:
                 print('File not found', filename)
