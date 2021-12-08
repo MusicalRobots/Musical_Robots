@@ -2,6 +2,7 @@
 A project that helps to identify the genre of an mp3 music file and discover other music of the same genre.
 
 [![Build Status](https://app.travis-ci.com/MusicalRobots/Musical_Robots.svg?branch=main)](https://app.travis-ci.com/MusicalRobots/Musical_Robots)
+[![Coverage Status](https://coveralls.io/repos/github/MusicalRobots/Musical_Robots/badge.svg)](https://coveralls.io/github/MusicalRobots/Musical_Robots)
 
 ## Repository Structure
 - /docs/: Component specification and functional specification.
