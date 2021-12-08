@@ -124,7 +124,7 @@ class Tests(unittest.TestCase):
 
     def test_most_popular_fake_genre(self):
         """Test fake genre."""
-        with self.assertRaises(Exception):
+        with self.assertRaises(RuntimeError):
             return_most_popular_song(genre="foo", genre_df=self.genre_df, track_df=self.track_df)
 
     def test_play_random_song_from_genre(self):
