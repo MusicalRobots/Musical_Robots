@@ -19,20 +19,19 @@ class Tests(unittest.TestCase):
     """
     @classmethod
     def setUpClass(cls):
-        """
-            Test that we can create a dataframe and then save results for
-            other tests
-        """
+        """Test that we can create a dataframe and then save results."""
 
         warnings.filterwarnings("ignore")
 
         output = create_dataframes(file_paths_path='musical_robots/data/all_data_path_short.txt',
                                    tracks_csv_path='musical_robots/data/fma_metadata/tracks_short.csv',
                                    genre_csv_path='musical_robots/data/fma_metadata/genres.csv')
-
         assert len(output) == 4
 
         cls.file_path_df, cls.track_df, cls.relevant_genre_df, cls.genre_df = output
+
+        print('IN SETUP CLASS', len(cls.file_path_df), len(cls.track_df),
+              len(cls.relevant_genre_df), (cls.genre_df))
 
         file = cls.file_path_df.iloc[0]['file_path']
         cls.filename = "musical_robots/data/fma_small/" + file
@@ -40,12 +39,12 @@ class Tests(unittest.TestCase):
         cls.genre = svm_prediction(filename=cls.filename, genre_df=cls.relevant_genre_df,
                                     model_filename='musical_robots/svm_model.pkl')
 
-    def test_create_dataframes(self):
-        """Test creating dataframes with a very shorted version of the data."""
-        output = create_dataframes(file_paths_path='musical_robots/data/all_data_path_short.txt',
-                                   tracks_csv_path='musical_robots/data/fma_metadata/tracks_short.csv',
-                                   genre_csv_path='musical_robots/data/fma_metadata/genres.csv')
-        assert len(output) == 4
+    # def test_create_dataframes(self):
+    #     """Test creating dataframes with a very shorted version of the data."""
+    #     output = create_dataframes(file_paths_path='musical_robots/data/all_data_path_short.txt',
+    #                                tracks_csv_path='musical_robots/data/fma_metadata/tracks_short.csv',
+    #                                genre_csv_path='musical_robots/data/fma_metadata/genres.csv')
+    #     assert len(output) == 4
 
     def test_split(self):
         """ test that the splitting function is working right"""
@@ -56,17 +55,21 @@ class Tests(unittest.TestCase):
 
     def test_audio_feature_dataset(self):
         """Smoke test to test the creation of an audio feature dataset."""
-        create_audio_feature_dataset(self.file_path_df,
+        train, validation, test = create_audio_feature_dataset(self.file_path_df,
                                      self.track_df,
                                      self.genre_df,
                                      path_to_data="musical_robots/data/fma_small/",
                                      test_percentage=0.2,
                                      validation_percentage=0.2)
 
+        print("IN CREATE AUDIO FEATURE DATASET", train.__len__(), test.__len__(), validation.__len__())
+
     def test_audio_feature(self):
         """Test making an audio feature object """
         AudioFeature(path_to_data="musical_robots/data/fma_small/", path_df=self.file_path_df,
                      music_df=self.track_df, genre_df=self.genre_df)
+
+        print("TESTING AUDIO FEATURE")
 
     def test_audio_feature_fake_file(self):
         """Test audio feature with fake filepath."""
@@ -96,24 +99,18 @@ class Tests(unittest.TestCase):
         self.assertIsNone(genre)
 
     def test_similar_genres(self):
-        """
-            Smoke tests to test functions of data queries
-        """
+        """Smoke tests to test functions of data queries."""
         k = 10
         similar_genres = return_similar_genres(genre=self.genre, genre_df=self.genre_df, track_df=self.track_df, k=k)
         assert len(similar_genres) < k
 
     def test_similar_genres_not_a_genre(self):
-        """
-            Test to check that fake genre throws an exception.
-        """
+        """Test to check that fake genre throws an exception."""
         with self.assertRaises(Exception):
             return_similar_genres(genre='foo', genre_df=self.genre_df, track_df=self.track_df, k=10)
 
     def test_similar_genres_k_out_of_range(self):
-        """
-            Test to check that k out of range throws an exception.
-        """
+        """Test to check that k out of range throws an exception."""
         with self.assertRaises(Exception):
             #when k is too small
             return_similar_genres(genre='pop', genre_df=self.genre_df, track_df=self.track_df, k=0)
