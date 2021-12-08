@@ -45,6 +45,9 @@ class AudioFeature:
             except (RuntimeError, audioread.NoBackendError):
                 print("Failed to load ", filename)
                 continue
+            except FileNotFoundError:
+                print('File not found', filename)
+                continue
 
             mel = librosa.feature.mfcc(y=y_audio, sr=sample_rate)
             mel = (mel - np.min(mel)) / (np.max(mel) - np.min(mel))
@@ -104,7 +107,7 @@ class AudioFeature:
         np.ndarray,
     ]:
         """
-        Return a single spectrogram and its label from the dataset.
+        Return a single audio feature instance and its label from the dataset.
 
         Args:
             idx: (int) Index of dataset item to return.
@@ -217,6 +220,7 @@ def create_audio_feature_dataset(
         for each sound file.
         track_df: (pd.DataFrame) Dataframe storing general track data.
         genre_df: (pd.Dataframe) Dataframe storing genre information.
+        path_to_data: (str) Path to where audio data is stored.
         test_percentage: (float) Percentage of paths to designate as
         part of the test dataset.
         validation_percentage: (float) Percentage of paths to designate

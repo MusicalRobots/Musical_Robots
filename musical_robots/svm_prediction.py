@@ -27,6 +27,9 @@ def svm_prediction(filename: str, genre_df: pd.DataFrame,
     except (RuntimeError, audioread.NoBackendError):
         print("Failed to load ", filename)
         return None
+    except FileNotFoundError:
+        print("File not found", filename)
+        return None
 
     mel = librosa.feature.mfcc(y=y_audio, sr=sample_rate)
     mel = (mel - np.min(mel)) / (np.max(mel) - np.min(mel))
