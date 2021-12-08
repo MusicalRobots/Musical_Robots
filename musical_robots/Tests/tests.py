@@ -136,22 +136,22 @@ class Tests(unittest.TestCase):
 
     def test_play_random_song_from_genre_no_songs(self):
         """Test that function runs when the genre exists, but there is no corresponding audio."""
-        output = play_random_song_from_genre(genre="nu-jazz", genre_df=self.genre_df, track_df=self.track_df,
+        song_output = play_random_song_from_genre(genre="nu-jazz", genre_df=self.genre_df, track_df=self.track_df,
                                              path_df=self.file_path_df, path_to_data='musical_robots/data/fma_small/')
-        self.assertIsNone(output[0])
+        self.assertIsNone(song_output[0])
 
     def test_play_random_song_from_genre_fake_genre(self):
         """Test for when genre does not exist in dataset."""
-        output =play_random_song_from_genre(genre="foo", genre_df=self.genre_df, track_df=self.track_df,
+        song_output =play_random_song_from_genre(genre="foo", genre_df=self.genre_df, track_df=self.track_df,
                                             path_df=self.file_path_df, path_to_data='musical_robots/data/fma_small/')
-        self.assertIsNone(output[0])
+        self.assertIsNone(song_output[0])
 
     def test_play_random_song_from_genre_audioread(self):
         track_df = pd.DataFrame(data={"track_genres": [[25]], "track_id": ['108925']})
         path_df = pd.DataFrame(data={"file_path": ['108/108925.mp3']})
-        output = play_random_song_from_genre(genre="punk", genre_df=self.genre_df, track_df=track_df,
+        song_output = play_random_song_from_genre(genre="punk", genre_df=self.genre_df, track_df=track_df,
                                              path_df=path_df, path_to_data='musical_robots/data/fma_small/')
-        self.assertIsNone(output[0])
+        self.assertIsNone(song_output[0])
 
     def test_play_song_from_filename(self):
         """Test that audio is returned for a valid filename."""
