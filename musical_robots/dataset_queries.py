@@ -181,6 +181,10 @@ def play_random_song_from_genre(
                     filename, sr=None, mono=True)
                 audio = ipd.Audio(data=y_audio, rate=sample_rate)
             except (RuntimeError, audioread.NoBackendError):
+                max_lookups += 1
+                if max_lookups > 10:
+                    print('Could not find song in genre.')
+                    return audio, song_title, artist_name, album_title
                 continue
 
             song_info = track_df[track_df["track_id"] == song_ids[rand_int]][

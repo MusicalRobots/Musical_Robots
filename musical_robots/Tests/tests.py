@@ -87,8 +87,11 @@ class Tests(unittest.TestCase):
                                model_filename='musical_robots/svm_model.pkl')
         self.assertIsNone(genre)
 
-    # def test_prediction_audioread_error(self):
-    #     #audioread
+    def test_prediction_audioread_error(self):
+        filename = 'musical_robots/data/fma_small/108/108925.mp3'
+        genre = svm_prediction(filename='fake_file', genre_df=self.relevant_genre_df,
+                               model_filename='musical_robots/svm_model.pkl')
+        self.assertIsNone(genre)
 
     def test_similar_genres(self):
         """
@@ -141,8 +144,12 @@ class Tests(unittest.TestCase):
                                             path_df=self.file_path_df, path_to_data='musical_robots/data/fma_small/')
         self.assertIsNone(output[0])
 
-    # def test_play_random_song_from_genre_audioread(self):
-    #     #audioread
+    def test_play_random_song_from_genre_audioread(self):
+        track_df = pd.DataFrame(data={"track_genres": [[25]], "track_id": ['108925']})
+        path_df = pd.DataFrame(data={"file_path": ['108/108925.mp3']})
+        output = play_random_song_from_genre(genre="punk", genre_df=self.genre_df, track_df=track_df,
+                                             path_df=path_df, path_to_data='musical_robots/data/fma_small/')
+        self.assertIsNone(output[0])
 
     def test_play_song_from_filename(self):
         """Test that audio is returned for a valid filename."""
@@ -154,5 +161,7 @@ class Tests(unittest.TestCase):
         audio = play_song_from_filename('fake_filename')
         self.assertIsNone(audio)
 
-    # def test_play_song_from_filename_audioread(self):
-    #     #audioread
+    def test_play_song_from_filename_audioread(self):
+        filename = 'musical_robots/data/fma_small/108/108925.mp3'
+        audio = play_song_from_filename(filename)
+        self.assertIsNone(audio)
