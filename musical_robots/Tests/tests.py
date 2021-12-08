@@ -30,6 +30,8 @@ class Tests(unittest.TestCase):
                                    tracks_csv_path='musical_robots/data/fma_metadata/tracks_short.csv',
                                    genre_csv_path='musical_robots/data/fma_metadata/genres.csv')
 
+        assert len(output) == 4
+
         cls.file_path_df, cls.track_df, cls.relevant_genre_df, cls.genre_df = output
 
         file = cls.file_path_df.iloc[0]['file_path']
