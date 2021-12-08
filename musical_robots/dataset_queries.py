@@ -34,6 +34,14 @@ def return_similar_genres(
         1, 11
     ), "You can only return between 1 and 10 most similar genres."
 
+    assert genre is not None, "A genre must be provided."
+
+    assert genre_df is not None, "A dataframe containing genre information" \
+                                 "must be provided."
+
+    assert track_df is not None, "A dataframe containing track information" \
+                                 "must be provided."
+
     genre_id = genre_df[
         genre_df["title"].apply(
             lambda x: x.lower().replace("-", "").replace(" ", "")
@@ -88,6 +96,14 @@ def return_most_popular_song(
         most_popular_songs: (List[str]) Most popular song in a given genre
         according to track listens.
     """
+    assert genre is not None, "A genre must be provided."
+
+    assert genre_df is not None, "A dataframe containing genre information" \
+                                 "must be provided."
+
+    assert track_df is not None, "A dataframe containing track information" \
+                                 "must be provided."
+
     genre_id = genre_df[
         genre_df["title"].apply(
             lambda x: x.lower().replace("-", "").replace(" ", "")
@@ -135,10 +151,21 @@ def play_random_song_from_genre(
         (ipd.Audio): Interactive playable file of a random song
         from the specified genre.
     """
+    assert genre is not None, "A genre must be provided."
+
+    assert genre_df is not None, "A dataframe containing genre information" \
+                                 "must be provided."
+
+    assert track_df is not None, "A dataframe containing track information" \
+                                 "must be provided."
+
+    assert path_df is not None, "A dataframe containing music file paths " \
+                                "must be provided."
+
     audio = None
-    song_title = "NA"
-    artist_name = "NA"
-    album_title = "NA"
+    song_title = None
+    artist_name = None
+    album_title = None
 
     genre_id = genre_df[
         genre_df["title"].apply(

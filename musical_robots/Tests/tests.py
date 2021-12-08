@@ -31,13 +31,7 @@ class Tests(unittest.TestCase):
         cls.file_path_df, cls.track_df, cls.relevant_genre_df, cls.genre_df = output
 
         print('IN SETUP CLASS', len(cls.file_path_df), len(cls.track_df),
-              len(cls.relevant_genre_df), (cls.genre_df))
-
-        file = cls.file_path_df.iloc[0]['file_path']
-        cls.filename = "musical_robots/data/fma_small/" + file
-
-        cls.genre = svm_prediction(filename=cls.filename, genre_df=cls.relevant_genre_df,
-                                    model_filename='musical_robots/svm_model.pkl')
+              len(cls.relevant_genre_df), len(cls.genre_df))
 
     # def test_create_dataframes(self):
     #     """Test creating dataframes with a very shorted version of the data."""
@@ -80,11 +74,10 @@ class Tests(unittest.TestCase):
 
     def test_prediction(self):
         """Smoke test to see if svm prediction works."""
-        file = self.file_path_df.iloc[0]['file_path']
-        filename = "musical_robots/data/fma_small/" + file
-
-        genre = svm_prediction(filename=self.filename, genre_df=self.relevant_genre_df,
+        filename = "musical_robots/data/fma_small/000/000002.mp3"
+        genre = svm_prediction(filename=filename, genre_df=self.relevant_genre_df,
                                model_filename='musical_robots/svm_model.pkl')
+        self.assertIsNotNone(genre)
 
     def test_prediction_fake_file(self):
         """Test prediction with a fake file."""
@@ -94,14 +87,14 @@ class Tests(unittest.TestCase):
 
     def test_prediction_audioread_error(self):
         filename = 'musical_robots/data/fma_small/108/108925.mp3'
-        genre = svm_prediction(filename='fake_file', genre_df=self.relevant_genre_df,
+        genre = svm_prediction(filename=filename, genre_df=self.relevant_genre_df,
                                model_filename='musical_robots/svm_model.pkl')
         self.assertIsNone(genre)
 
     def test_similar_genres(self):
         """Smoke tests to test functions of data queries."""
         k = 10
-        similar_genres = return_similar_genres(genre=self.genre, genre_df=self.genre_df, track_df=self.track_df, k=k)
+        similar_genres = return_similar_genres(genre='pop', genre_df=self.genre_df, track_df=self.track_df, k=k)
         assert len(similar_genres) < k
 
     def test_similar_genres_not_a_genre(self):
@@ -115,11 +108,20 @@ class Tests(unittest.TestCase):
             #when k is too small
             return_similar_genres(genre='pop', genre_df=self.genre_df, track_df=self.track_df, k=0)
             #when k is too big
+        with self.assertRaises(Exception):
             return_similar_genres(genre='pop', genre_df=self.genre_df, track_df=self.track_df, k=11)
+
+    def test_similar_genres_invalid_args(self):
+        with self.assertRaises(Exception):
+            return_similar_genres(genre=None, genre_df=self.genre_df, track_df=self.track_df, k=10)
+        with self.assertRaises(Exception):
+            return_similar_genres(genre='pop', genre_df=None, track_df=self.track_df, k=10)
+        with self.assertRaises(Exception):
+            return_similar_genres(genre='pop', genre_df=self.genre_df, track_df=None, k=10)
 
     def test_most_popular(self):
         """Smoke tests to test functions of data queries."""
-        return_most_popular_song(genre=self.genre, genre_df=self.genre_df, track_df=self.track_df)
+        return_most_popular_song(genre='pop', genre_df=self.genre_df, track_df=self.track_df)
 
     def test_most_popular_fake_genre(self):
         """Test fake genre."""
@@ -128,7 +130,7 @@ class Tests(unittest.TestCase):
 
     def test_play_random_song_from_genre(self):
         """Smoke test for play random song from genre."""
-        play_random_song_from_genre(genre=self.genre, genre_df=self.genre_df, track_df=self.track_df,
+        play_random_song_from_genre(genre='pop', genre_df=self.genre_df, track_df=self.track_df,
                                     path_df=self.file_path_df, path_to_data='musical_robots/data/fma_small/')
 
     def test_play_random_song_from_genre_no_songs(self):
@@ -150,9 +152,28 @@ class Tests(unittest.TestCase):
                                              path_df=path_df, path_to_data='musical_robots/data/fma_small/')
         self.assertIsNone(song_output[0])
 
+    def test_play_random_song_from_genre_invalid_args(self):
+        with self.assertRaises(Exception):
+            play_random_song_from_genre(genre=None, genre_df=self.genre_df, track_df=self.track_df,
+                                                  path_df=self.file_path_df,
+                                                  path_to_data='musical_robots/data/fma_small/')
+        with self.assertRaises(Exception):
+            play_random_song_from_genre(genre='pop', genre_df=None, track_df=self.track_df,
+                                    path_df=self.file_path_df,
+                                    path_to_data='musical_robots/data/fma_small/')
+        with self.assertRaises(Exception):
+            play_random_song_from_genre(genre='pop', genre_df=self.genre_df, track_df=None,
+                                    path_df=self.file_path_df,
+                                    path_to_data='musical_robots/data/fma_small/')
+        with self.assertRaises(Exception):
+            play_random_song_from_genre(genre='pop', genre_df=self.genre_df, track_df=self.track_df,
+                                        path_df=None,
+                                        path_to_data='musical_robots/data/fma_small/')
+
     def test_play_song_from_filename(self):
         """Test that audio is returned for a valid filename."""
-        audio = play_song_from_filename(self.filename)
+        filename = "musical_robots/data/fma_small/000/000002.mp3"
+        audio = play_song_from_filename(filename)
         self.assertIsNotNone(audio)
 
     def test_play_song_invalid_filename(self):
