@@ -4,7 +4,9 @@ Tests for Musical Robots
 """
 import unittest
 import pandas as pd
+import os
 
+import musical_robots
 from musical_robots.spectrogram_dataset import create_dataframes, AudioFeature, split_data, \
                                create_audio_feature_dataset
 from musical_robots.svm_prediction import svm_prediction
@@ -12,6 +14,8 @@ from musical_robots.dataset_queries import return_similar_genres, return_most_po
     play_random_song_from_genre, play_song_from_filename
 
 import warnings
+
+data_path = os.path.join(musical_robots.__path__[0], 'data/fma_small/')
 
 class Tests(unittest.TestCase):
     """
@@ -52,7 +56,7 @@ class Tests(unittest.TestCase):
         train, validation, test = create_audio_feature_dataset(self.file_path_df,
                                      self.track_df,
                                      self.genre_df,
-                                     path_to_data="musical_robots/data/fma_small/",
+                                     path_to_data=data_path,
                                      test_percentage=0.2,
                                      validation_percentage=0.2)
 
@@ -60,7 +64,7 @@ class Tests(unittest.TestCase):
 
     def test_audio_feature(self):
         """Test making an audio feature object """
-        AudioFeature(path_to_data="musical_robots/data/fma_small/", path_df=self.file_path_df,
+        AudioFeature(path_to_data=data_path, path_df=self.file_path_df,
                      music_df=self.track_df, genre_df=self.genre_df)
 
         print("TESTING AUDIO FEATURE")
@@ -74,7 +78,7 @@ class Tests(unittest.TestCase):
 
     def test_prediction(self):
         """Smoke test to see if svm prediction works."""
-        filename = "musical_robots/data/fma_small/000/000002.mp3"
+        filename = os.path.join(data_path, '000/000002.mp3')
         genre = svm_prediction(filename=filename, genre_df=self.relevant_genre_df,
                                model_filename='musical_robots/svm_model.pkl')
         self.assertIsNotNone(genre)
@@ -86,7 +90,8 @@ class Tests(unittest.TestCase):
         self.assertIsNone(genre)
 
     def test_prediction_audioread_error(self):
-        filename = 'musical_robots/data/fma_small/108/108925.mp3'
+        filename = os.path.join(data_path, '108/108925.mp3.mp3')
+        # filename = 'musical_robots/data/fma_small/108/108925.mp3'
         genre = svm_prediction(filename=filename, genre_df=self.relevant_genre_df,
                                model_filename='musical_robots/svm_model.pkl')
         self.assertIsNone(genre)
@@ -131,48 +136,48 @@ class Tests(unittest.TestCase):
     def test_play_random_song_from_genre(self):
         """Smoke test for play random song from genre."""
         play_random_song_from_genre(genre='pop', genre_df=self.genre_df, track_df=self.track_df,
-                                    path_df=self.file_path_df, path_to_data='musical_robots/data/fma_small/')
+                                    path_df=self.file_path_df, path_to_data=data_path)
 
     def test_play_random_song_from_genre_no_songs(self):
         """Test that function runs when the genre exists, but there is no corresponding audio."""
         song_output = play_random_song_from_genre(genre="nu-jazz", genre_df=self.genre_df, track_df=self.track_df,
-                                             path_df=self.file_path_df, path_to_data='musical_robots/data/fma_small/')
+                                             path_df=self.file_path_df, path_to_data=data_path)
         self.assertIsNone(song_output[0])
 
     def test_play_random_song_from_genre_fake_genre(self):
         """Test for when genre does not exist in dataset."""
         song_output =play_random_song_from_genre(genre="foo", genre_df=self.genre_df, track_df=self.track_df,
-                                            path_df=self.file_path_df, path_to_data='musical_robots/data/fma_small/')
+                                            path_df=self.file_path_df, path_to_data=data_path)
         self.assertIsNone(song_output[0])
 
     def test_play_random_song_from_genre_audioread(self):
         track_df = pd.DataFrame(data={"track_genres": [[25]], "track_id": ['108925']})
         path_df = pd.DataFrame(data={"file_path": ['108/108925.mp3']})
         song_output = play_random_song_from_genre(genre="punk", genre_df=self.genre_df, track_df=track_df,
-                                             path_df=path_df, path_to_data='musical_robots/data/fma_small/')
+                                             path_df=path_df, path_to_data=data_path)
         self.assertIsNone(song_output[0])
 
     def test_play_random_song_from_genre_invalid_args(self):
         with self.assertRaises(Exception):
             play_random_song_from_genre(genre=None, genre_df=self.genre_df, track_df=self.track_df,
                                                   path_df=self.file_path_df,
-                                                  path_to_data='musical_robots/data/fma_small/')
+                                                  path_to_data=data_path)
         with self.assertRaises(Exception):
             play_random_song_from_genre(genre='pop', genre_df=None, track_df=self.track_df,
                                     path_df=self.file_path_df,
-                                    path_to_data='musical_robots/data/fma_small/')
+                                    path_to_data=data_path)
         with self.assertRaises(Exception):
             play_random_song_from_genre(genre='pop', genre_df=self.genre_df, track_df=None,
                                     path_df=self.file_path_df,
-                                    path_to_data='musical_robots/data/fma_small/')
+                                    path_to_data=data_path)
         with self.assertRaises(Exception):
             play_random_song_from_genre(genre='pop', genre_df=self.genre_df, track_df=self.track_df,
                                         path_df=None,
-                                        path_to_data='musical_robots/data/fma_small/')
+                                        path_to_data=data_path)
 
     def test_play_song_from_filename(self):
         """Test that audio is returned for a valid filename."""
-        filename = "musical_robots/data/fma_small/000/000002.mp3"
+        filename = os.path.join(data_path, '000/000002.mp3')
         audio = play_song_from_filename(filename)
         self.assertIsNotNone(audio)
 
@@ -182,6 +187,6 @@ class Tests(unittest.TestCase):
         self.assertIsNone(audio)
 
     def test_play_song_from_filename_audioread(self):
-        filename = 'musical_robots/data/fma_small108/108925.mp3'
+        filename = os.path.join(data_path, '108/108925.mp3.mp3')
         audio = play_song_from_filename(filename)
         self.assertIsNone(audio)
