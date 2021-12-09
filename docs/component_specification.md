@@ -1,134 +1,124 @@
-# Software Components
+# Major Software Components
+1) Data Manager: Provides functionality to load the data as pandas dataframes, split the data into training, test, and validation sets, create a custom audio feature dataset for ML model training, and query subsets of the data.  
 
-## Use case: return most similar genres
-Name: ReturnSimilarGenres
+2) ML Model: Runs a pre-trained Support Vector Machine on the test data and provides an accuracy report.
 
-What it does: Returns up to top 10 most similar genres to the input genre ranked by decreasing similarity.
+2) User Interface: Implementation of the musical robot, which the user can interact with.  The user can upload an mp3 file and follow the prompts given by the robot to predict the genre of the audio and return information about the most popular song in the genre and songs in similar genres.
 
-Inputs: genre: _string_ specifying genre to compare to
-	number_similar: _integer_ between 1 and 10 specifying how many ranked similar genres to return
 
-Outputs: similar_genres: _List of strings_ containing ranked list of most similar genres 
+## Components of Data Manager
+<b> Name: </b> create_dataframes
 
-## Use Case: Play song
-Name: play_song
+	What it does: Creates dataframes for music audio analysis.
 
-What it does: Plays an mp3 file.
-
-Inputs: song_mp3: _mp3_ of a song 
-
-Outputs: _IPython.core.display.DisplayObject_ The playable file displayed in the Jupyter notebook.
-
-## Use Case: Return mp3 of a song.
-
-Name: return_mp3
-
-What it does: Queries the song database to see if a particular mp3 is in the database.  If the song exists, the mp3 is returned.  If the file does not exist, the user is told the song does not exist in the database.
-
-Inputs: song_name: _string_ Title of a song
-
-Outputs: song_mp3: _mp3_ of a the given song 
-
-## Use Case: Return most popular song in a genre
-Name: return_most_popular_song
-
-What it does: Queries the database containing songs and their respective genres to return the most popular song in a given genre.
-
-Inputs: genre: _string_ genre name
-
-Outputs: most_popular_song: _string_ Name of most popular song in the genre.
-
-## Use case: Return most similar genre
-Name: return_most_similar_genre
-
-What it does: Queries the genre and song databases to find the genres most often co-classifed with the given genre.
-
-Inputs: genre: _string_ genre name
-
-Outputs: most_similar_genres: _List of strings_ Ranked list of most similar genres
-
-## Use Case: Return genre
-Name: return_genre
-
-What it does: Predicts the genre of a given mp3 file.  Returns a pie chart of the probabilites of nonzero genres.  
-
-Inputs: song_mp3: _mp3_ of a song.
-
-Outputs: pie_chart: _plt.pie_ chart displaying the probabilities of nonzero genres.
-	 most_likely_genre: _string_ specifying the most likely genre. 
-
-## Use case: Generate spectrogram from audio
-Name: generate_spectrogram
-
-What it does: Generates a spectrogram of an mp3 file. 
-
-Inputs: song_mp3: _mp3_ of a song
-	sample_rate: _int_ sample rate of the song
-	n_fft: _int_ length of the fft window
-	hop length: _int_ number of samples between successive frames
-
-Outputs: spectrogram: spectrogram of audio file
+	Inputs: file_paths_path: (str) Path to 'all_data_paths.txt' storing the data paths for each sound file.
+        tracks_csv_path: (str) Path to 'tracks.csv' containing general track data.
+        genre_csv_path: (str) Path to 'genre.csv' containing genre information.
 	
-## Use Case: Train Network
-Name: train_network
-
-What it does: Trains the neural network. Validates during the training process.
-
-Inputs: train_data: data to train the network 
-	validation_data: data to validate the network 
-	model: architecture of network
-	optimizer: optimizer to use
-	loss function: loss function to use
+	Outputs: file_path_df: (pd.DataFrame) Dataframe storing the data paths for each sound file.
+        track_df: (pd.DataFrame) Dataframe storing general track data.
+        relevant_genre_df: (pd.DataFrame) Dataframe storing genre information for downloaded audio.
+        genre_df: (pd.DataFrame) Dataframe storing genre information for all genres in the track_df.
 	
-Outputs: epoch: _int_ Epoch number
-	 loss: _float_ current loss
-	 
-## Use Case: Test Network
-Name: test_network
+<b> Name: </b> split_data
 
-What it does: Tests the network. 
+	What it does: Split data into 3 datasets for training, testing and validation.
 
-Inputs: test_data: data to test the network
+	Inputs: file_path_df: (pd.DataFrame) Dataframe storing the data paths for each sound file.
+        test_percentage: (float) Percentage of paths to designate as part of the test dataset.
+        validation_percentage: (float) Percentage of paths to designate as part of the validation dataset.
 
-Outputs: accuracy: _float_ test accuracy
+	Outputs: train_df: (pd.DataFrame) DataFrame of data for the training set
+        test_df: (pd.DataFrame) Dataframe of data for the testing set
+        validation_df: (pd.DataFrame) Dataframe of data for the validation set
 
-## Use Case: Pass mp3 to have genres predicted through the network
+<b> Name: </b> AudioFeature
+	
+	What it does: Create custom dataset of audio features and genre labels.
+	
+	Inputs: path_to_data: (str)
+            path_df: (pd.Dataframe) DataFrame containing file paths.
+            music_df: (pd.DataFrame) Dataframe containing music information.
+            genre_df: (pd.DataFrame) Dataframe containing genre information.
+	
+	Outputs: List of data tuples.
 
-Name: predict_genre
+	
+<b> Name: </b> create_audio_feature_dataset
+	
+	What it does: Create the custom dataset given the locations of the data.
+	
+	Inputs: file_path_df: (pd.DataFrame) Dataframe storing the data paths for each sound file.
+        track_df: (pd.DataFrame) Dataframe storing general track data.
+        genre_df: (pd.Dataframe) Dataframe storing genre information.
+        path_to_data: (str) Path to where audio data is stored.
+        test_percentage: (float) Percentage of paths to designate as part of the test dataset.
+        validation_percentage: (float) Percentage of paths to designate as part of the validation dataset.
+	
+	Outupts: Three AudioFeature datasets.
+	
+<b> Name: </b> dataset_queries
 
-What it does? Passes the mp3 through the trained network and returns a genre prediction.
+	What it does: File containing queries to play a given song from a filename, return the most similar genres, return the most popular song in a genre, and play a random song from a given genre.
+	
+	Inputs: Most of the queries require some combination of: 
+	genre: (str) String specifying genre to compare to.
+        genre_df: (pd.DataFrame) Dataframe storing genre information.
+        track_df: (pd.DataFrame) Dataframe storing general track data.
+	path_df: (pd.DataFrame) Dataframe storing path information.
+        path_to_data: (str) Path to where audio data is stored.
+	
+	Outputs: The outputs of the desired query. 
+	
+<b> Interactions to Accomplish Use Cases </b>
+1) User calls create_dataframes to create the dataframes for music audio analysis. 
+2) User calls create_audio_feature_dataset to return three AudioFeature datasets.  The system calls split_data to split the data into training, test, and validation sets.  The system then calls AudioFeature on each subset of the data to return three AudioFeature datasets.
+3) The user can call any function in dataset_queries to query the dataframes created in step 1.
 
-Inputs: spectrogram: Spectrogram of audio file
+## Comonents of ML Model
 
-Returns: genre_prediction: List of predicted genres.
+<b> Name: </b> svm_prediction
+	
+	What it does: Return SVM prediction of genre from an audio file.
+	
+	Inputs: filename (str): path to music mp3 file
+        genre_df (pd.DataFrame): Dataframe containing genre information.
+        model_filename (str): Path to the model file.
 
-# Interactions to accomplish use cases
+	Outputs: genre (str): Predicted genre of the mp3 file.
 
-## Return song genre
-1) User passes an mp3 into return_genre and specifies up to how many similar genres to return
-2) System calls generate_spectrogram to generate a spectrogram.
-3) System calls predict_genre to run the spectrogram through the pre-trained NN and return probabilites of each genre prediction.
-4) return_genre returns a pie chart of the genre probabilities and a print out of the ranked list of most likely genres.
+<b> Name: </b> svm_accuracy_report
 
-## Return most popular song in genre
-1) User calls return_most_popular_song on a given genre.
-2) System returns title of most popular song.
-3) System calls return_mp3 on the song title to see if the sound file is in the database.  If it is not, nothing happens further.  If the song is in the database, system asks user if they want to hear the song.
-4) If user wants to hear song, system calls play_mp3 to return an interactive playable track.
+	What it does: Return accuracy report of trained SVM.
+	
+	Inputs: true_labels: (List[int]) True labels for genre.
+        pred_labels: (List[int]) Predicted labels for genre.
+	
+	Outputs: tp_rate_list: (List[float]) List of true positive rate of predictions per genre.
+        fp_rate_list: (List[float]) List of false positive rate of predictions per genre.
+        accuracy: (float) Overall accuracy of predicted labels against true labels.
 
-## Return similar genres
-1) User calls return_most_similar_genres on a given genre.
-2) System returns list of most similar genres.
+<b> Interactions to Accomplish Use Cases </b>
+1) User calls create_dataframes from the Data Manager components to create the dataframes for music audio analysis. 
+2) User calls svm_prediction on an audio file to predict the genre.
+3) If testing an SVM an many audio files, user can call svm_accuracy_report to return an accuracy report for their model.
 
-## Train network
-1) User defines their own network architecture and calls train_network to train the model.
-2) User calls test_network to test the accuracy of the network. 
+## Components of User Interface
+
+<b> Name: Interactive </b>
+
+	What it does: Implementation of interactive class to communicate with user.  Walks the user through music upload, genre prediction, returns the most popular song in the genre, and plays songs in similar genres.
+	
+	Inputs: mp3 audio file
+	
+	Ouputs: User interaction.
+	
+<b> Interactions to Accomplish Use Cases </b>:
+1) User uploads an mp3 audio file.
+2) User follows along with the musical robot to return desired information.  System calls on components from both the Data Manager and the ML Model to reutrn the information.
 
 # Preliminary Plan:
-1) Download with smallest music dataset and experiment with the data to better understand it. 
-2) Test various preprocessing techniques as well as network architectures and begin writing train_network, test_network, predict_genre, and return_genre. 
-3) Write functions that don't depend on the genre prediction: play_song, return_mp3, return_most_popular_song, and return_most_similar_genres.
-
-
-
-
+1) Cretate a dataset for music genre prediction.
+2) Train an ML model for music genre prediction.
+3) Write queries for the most popular song in a genre and the most similar genres.
+4) Implement the UI for the Musical Robot.
