@@ -1,5 +1,8 @@
-# Musical_Robots
-A project that helps to identify the genre of an mp3 music file and discover other music of the same genre.
+# Musical Robot
+![alt text](https://github.com/MusicalRobots/Musical_Robots/blob/main/MusicalRobotLogo.png?raw=true)
+
+A project that helps identify the genre of an mp3 music file and discover other music of similar genres.
+
 
 [![Build Status](https://app.travis-ci.com/MusicalRobots/Musical_Robots.svg?branch=main)](https://app.travis-ci.com/MusicalRobots/Musical_Robots)
 [![Coverage Status](https://coveralls.io/repos/github/MusicalRobots/Musical_Robots/badge.svg?branch=main)](https://coveralls.io/github/MusicalRobots/Musical_Robots?branch=main)
