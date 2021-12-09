@@ -7,6 +7,7 @@ import os
 import warnings
 import unittest
 import pandas as pd
+import numpy as np
 import musical_robots
 from musical_robots.spectrogram_dataset import (
     create_dataframes,
@@ -14,7 +15,8 @@ from musical_robots.spectrogram_dataset import (
     split_data,
     create_audio_feature_dataset,
 )
-from musical_robots.svm_prediction import svm_prediction
+from musical_robots.svm_prediction import svm_prediction, \
+    svm_accuracy_report
 from musical_robots.dataset_queries import (
     return_similar_genres,
     return_most_popular_song,
@@ -122,6 +124,27 @@ class Tests(unittest.TestCase):
             model_filename="musical_robots/svm_model.pkl",
         )
         self.assertIsNone(genre)
+
+    def test_svm_accuracy_report_invalid_inputs(self):
+        """Test the svm accuracy report with invalid inputs."""
+        with self.assertRaises(Exception):
+            svm_accuracy_report(true_labels=None, pred_labels=np.arange(5))
+        with self.assertRaises(Exception):
+            svm_accuracy_report(true_labels=np.arange(5), pred_labels=None)
+        with self.assertRaises(Exception):
+            svm_accuracy_report(true_labels=np.arange(5),
+                                pred_labels=np.arange(3))
+
+    def test_svm_accuracy_report(self):
+        tp_rate, fp_rate, accuracy = \
+            svm_accuracy_report(true_labels=[1, 2, 3, 2, 3, 2, 1],
+                                pred_labels=[1, 2, 2, 2, 3, 2, 3])
+        true_tp_rate = [.50, 1, .50]
+        true_fp_rate = [0, .25, .20]
+
+        np.testing.assert_array_equal(tp_rate, true_tp_rate)
+        np.testing.assert_array_equal(fp_rate, true_fp_rate)
+        self.assertAlmostEqual(71, accuracy, places=0)
 
     def test_similar_genres(self):
         """Smoke tests to test functions of data queries."""

@@ -1,7 +1,7 @@
 """Implement SVM that predicts genre from an audio file."""
 
 import pickle
-from typing import Optional, List
+from typing import Optional, List, Union, Tuple
 import numpy as np
 import pandas as pd
 import librosa
@@ -65,8 +65,9 @@ def svm_prediction(filename: str, genre_df: pd.DataFrame,
     return genre
 
 
-def svm_accuracy_report(true_labels: List[int],
-                        pred_labels: List[int]) -> None:
+def svm_accuracy_report(true_labels: Union[List[int], np.ndarray],
+                        pred_labels: Union[List[int], np.ndarray]
+                        ) -> Tuple[float, float, float]:
     """
     Return accuracy report of trained SVM.
 
@@ -74,12 +75,27 @@ def svm_accuracy_report(true_labels: List[int],
         true_labels: (List[int]) True labels of genre.
         pred_labels: (List[int]) Predicted labels of genre.
     """
-    all_ind = np.arange(800)
+
+    assert true_labels is not None, "True labels cannot be a none type object."
+    assert pred_labels is not None, "Pred labels cannot be a none type object."
+
+    assert len(true_labels) == len(pred_labels), \
+        "True and predicted labels must be the same length. "
+
+    if type(true_labels) is list:
+        true_labels = np.array(true_labels)
+    if type(pred_labels) is list:
+        pred_labels = np.array(pred_labels)
+
+    all_ind = np.arange(len(true_labels))
     ind = np.where(pred_labels == true_labels)[0]
+    accuracy = (len(ind) / len(pred_labels)) * 100
+    tp_rate_list = []
+    fp_rate_list = []
 
     print(len(ind), ' test files of a total of ', len(pred_labels),
           'are predicted correctly for an accuracy of ',
-          (len(ind) / len(pred_labels)) * 100, '%\n\n')
+          accuracy, '%\n\n')
 
     for i in np.unique(true_labels):
         true_ind = np.where(true_labels == i)[0]
@@ -99,8 +115,11 @@ def svm_accuracy_report(true_labels: List[int],
         fp_rate = fp / (fp + tn)
         tp_rate = tp / (fn + tp)
 
+        tp_rate_list.append(tp_rate)
+        fp_rate_list.append(fp_rate)
+
         print('True Positive Rate: %.3f False Positive Rate: %.3f '
               'Percent Correct for '
               'genre %s: %.3f' % (tp_rate, fp_rate, i, percentage_ind))
 
-    return None
+    return tp_rate_list, fp_rate_list, accuracy
