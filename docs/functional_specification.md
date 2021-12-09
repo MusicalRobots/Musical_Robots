@@ -14,9 +14,6 @@ User wants to predict the genre for a batch of audio files using the pre-trained
 
 The user can follow the tutorial in GenrePredictionTutorial.  The user will create dataframes and the training, testing, and validation datasets using the functions in spectrogram_dataset.  The user will run the pre-trained SVM using the functions in svm_prediction and return an accuracy report if they are itnerested.  The user can use the functions in dataset_queries to query the created dataframes.
 
-Valentina wants to change the architecture of the network used to predict music genre and/or add data to the training set.
-Valentina is a data scientist and highly technical.  
-
 ## User 3:
 The user has a fundamental understanding of machine learning and wants to train their own Support Vector Machine for music genre prediction.  The user knows how to operate a Jupyter Notebook
 
