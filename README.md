@@ -1,5 +1,5 @@
 # Musical Robot
-![Alt text](.docs/MusicalRobotLogo.png?raw=true)
+![Alt text](.docs/MusicalRobotLogo.png?raw=true "Title" | width=100)
 
 A project that helps identify the genre of an mp3 music file and discover other music of similar genres.
 
