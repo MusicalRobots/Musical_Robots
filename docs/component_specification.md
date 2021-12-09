@@ -103,7 +103,7 @@
 2) User calls svm_prediction on an audio file to predict the genre.
 3) If testing an SVM an many audio files, user can call svm_accuracy_report to return an accuracy report for their model.
 
-# Components of User Interface
+## Components of User Interface
 
 <b> Name: Interactive </b>
 
@@ -117,7 +117,7 @@
 1) User uploads an mp3 audio file.
 2) User follows along with the musical robot to return desired information.  System calls on components from both the Data Manager and the ML Model to reutrn the information.
 
-## Preliminary Plan:
+# Preliminary Plan:
 1) Cretate a dataset for music genre prediction.
 2) Train an ML model for music genre prediction.
 3) Write queries for the most popular song in a genre and the most similar genres.
