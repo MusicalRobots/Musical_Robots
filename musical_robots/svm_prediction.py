@@ -1,7 +1,7 @@
 """Implement SVM that predicts genre from an audio file."""
 
 import pickle
-from typing import Optional
+from typing import Optional, List
 import numpy as np
 import pandas as pd
 import librosa
@@ -63,3 +63,44 @@ def svm_prediction(filename: str, genre_df: pd.DataFrame,
     genre = genre_df.iloc[label]["title"].item()
 
     return genre
+
+
+def svm_accuracy_report(true_labels: List[int],
+                        pred_labels: List[int]) -> None:
+    """
+    Return accuracy report of trained SVM.
+
+    Args:
+        true_labels: (List[int]) True labels of genre.
+        pred_labels: (List[int]) Predicted labels of genre.
+    """
+    all_ind = np.arange(800)
+    ind = np.where(pred_labels == true_labels)[0]
+
+    print(len(ind), ' test files of a total of ', len(pred_labels),
+          'are predicted correctly for an accuracy of ',
+          (len(ind) / len(pred_labels)) * 100, '%\n\n')
+
+    for i in np.unique(true_labels):
+        true_ind = np.where(true_labels == i)[0]
+        true_neg = np.setdiff1d(all_ind, true_ind)
+
+        pred_ind = np.where(pred_labels == i)[0]
+        pred_neg = np.setdiff1d(all_ind, pred_ind)
+
+        percentage_ind = (len(
+            np.intersect1d(true_ind, pred_ind)) / len(true_ind)) * 100
+
+        fp = len(np.setdiff1d(pred_ind, true_ind))
+        tp = len(np.intersect1d(true_ind, pred_ind))
+        tn = len(np.intersect1d(true_neg, pred_neg))
+        fn = len(np.setdiff1d(pred_neg, true_neg))
+
+        fp_rate = fp / (fp + tn)
+        tp_rate = tp / (fn + tp)
+
+        print('True Positive Rate: %.3f False Positive Rate: %.3f '
+              'Percent Correct for '
+              'genre %s: %.3f' % (tp_rate, fp_rate, i, percentage_ind))
+
+    return None
