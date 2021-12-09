@@ -20,6 +20,11 @@ A project that helps identify the genre of an mp3 music file and discover music 
 1) Download full repository.
 2) To use the service to identify an mp3 music file's genre and explore similar music:
 	- Open the following file: 'musical_robots/musical_robots_start.ipynb' and follow the instructions.	
+	- The interaction will look as follows:
+<p align="center">
+	<img src="docs/MusicalRobotFlowchart.png" height="600"> 
+</p>
+	
 3) To replicate the ML model:
 	- Follow the tutorial in 'musical_robots/GenrePredictionTutorial.py'
 4) To train your own ML model:
