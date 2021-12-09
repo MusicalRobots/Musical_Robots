@@ -13,7 +13,7 @@ warnings.filterwarnings("ignore")
 
 
 class AudioFeature:
-    """Create custom dataset of spectrograms and genre labels."""
+    """Create custom dataset of audio features and genre labels."""
 
     def __init__(
         self, path_to_data="data/fma_small/",
@@ -122,9 +122,9 @@ def create_dataframes(
     Create dataframes for audio analysis.
 
     Args:
-        file_paths_path: (pd.DataFrame) Path to 'all_data_paths.txt' storing
+        file_paths_path: (str) Path to 'all_data_paths.txt' storing
         the data paths for each sound file.
-        tracks_csv_path: (pd.DataFrame) Path to 'tracks.csv' containing
+        tracks_csv_path: (str) Path to 'tracks.csv' containing
         general track data.
         genre_csv_path: (str) Path to 'genre.csv' containing genre information.
 
@@ -133,7 +133,8 @@ def create_dataframes(
         for each sound file.
         track_df: (pd.DataFrame) Dataframe storing general track data.
         relevant_genre_df: (pd.DataFrame) Dataframe storing genre information.
-        genre_df: (pd.DataFrame)
+        genre_df: (pd.DataFrame) Dataframe storing genre information for
+        all genres in the track_df.
     """
     file_path_df = pd.read_csv(file_paths_path,
                                header=None, names=["file_path"])

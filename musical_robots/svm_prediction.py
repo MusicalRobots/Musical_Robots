@@ -14,11 +14,12 @@ def svm_prediction(filename: str, genre_df: pd.DataFrame,
     Return SVM prediction of genre from an audio file.
 
     Args:
-       filename (str): path to music mp3 file
+       filename (str): Path to music mp3 file
        genre_df (pd.DataFrame): Dataframe containing genre information.
-       model_filename (str): path to the model file. default is "svm_model.pkl"
+       model_filename (str): Path to the model file.
+       Default is "svm_model.pkl".
     Returns:
-        genre (str): predicted genre of the mp3 file
+        genre (str): Predicted genre of the mp3 file.
     """
     features = []
 
@@ -67,13 +68,21 @@ def svm_prediction(filename: str, genre_df: pd.DataFrame,
 
 def svm_accuracy_report(true_labels: Union[List[int], np.ndarray],
                         pred_labels: Union[List[int], np.ndarray]
-                        ) -> Tuple[float, float, float]:
+                        ) -> Tuple[List[float], List[float], float]:
     """
     Return accuracy report of trained SVM.
 
     Args:
-        true_labels: (List[int]) True labels of genre.
-        pred_labels: (List[int]) Predicted labels of genre.
+        true_labels: (Union[List[int], np.ndarray]) True labels for genre.
+        pred_labels: (Union[List[int], np.ndarray]) Predicted labels for genre.
+
+    Outputs:
+        tp_rate_list: (List[float]) List of true positive rate of
+        predictions per genre.
+        fp_rate_list: (List[float]) List of false positive rate of
+        predictions per genre.
+        accuracy: (float) Overall accuracy of predicted labels
+        against true labels.
     """
 
     assert true_labels is not None, "True labels cannot be a none type object."
