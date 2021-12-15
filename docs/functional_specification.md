@@ -5,7 +5,7 @@ We will also return the most popular songs in that genre and other similar genre
 
 # User Profiles
 ## User 1:
-User has an audio file.  User wants to know the genre of the music file. The user must be able to operate a Jupyter Notebook.
+User has an audio file.  User wants to know the genre of the music file. The user must be able to run the command "streamlit run file" from the terminal. 
 
 The user uploads their music file, and uses the Musical Robot UI to predict the genre, learn the most popular song in the genre, and learn what the other most similar genres are.  The user can choose whether to listen to their uploaded file, the most popular song, or a random song from a similar genre. 
 
