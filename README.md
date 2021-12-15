@@ -15,7 +15,7 @@ A project that helps identify the genre of an mp3 music file and discover music 
 - /musical_robots/data/: Raw data that was used for training the ML model and data containing track and genre information.
 - /musical_robots/tests/: Unit tests.
 - /musical_robots/demo.py: Musical Robot User Interaction
-- /tutorial_notebooks/: Tutorial notebooks for SVM training and genre prediction.
+- /examples/: Tutorial notebooks for SVM training and genre prediction.
 
 
 ## Use
