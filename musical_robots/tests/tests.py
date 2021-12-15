@@ -18,12 +18,15 @@ from musical_robots.spectrogram_dataset import (
 )
 from musical_robots.svm_prediction import svm_prediction, \
     svm_accuracy_report
+
 from musical_robots.dataset_queries import (
     return_similar_genres,
     return_most_popular_song,
     play_random_song_from_genre,
     play_song_from_filename,
 )
+
+from musical_robots.demo import Interactive
 
 data_path = os.path.join(musical_robots.__path__[0], "data/fma_small/")
 
@@ -305,3 +308,7 @@ class Tests(unittest.TestCase):
         filename = os.path.join(data_path, "108/108925.mp3")
         audio = play_song_from_filename(filename)
         self.assertIsNone(audio)
+
+    def test_interactive(self):
+        """Smoke test for the interactive class"""
+        Interactive()
