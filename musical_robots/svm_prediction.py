@@ -9,7 +9,7 @@ import audioread
 
 
 def svm_prediction(filename: str, genre_df: pd.DataFrame,
-                   model_filename: str = "svm_model.pkl") -> Optional[str]:
+                   model_filename: str = "data/svm_model.pkl") -> Optional[str]:
     """
     Return SVM prediction of genre from an audio file.
 
@@ -17,7 +17,7 @@ def svm_prediction(filename: str, genre_df: pd.DataFrame,
        filename (str): Path to music mp3 file
        genre_df (pd.DataFrame): Dataframe containing genre information.
        model_filename (str): Path to the model file.
-       Default is "svm_model.pkl".
+       Default is "data/svm_model.pkl".
     Returns:
         genre (str): Predicted genre of the mp3 file.
     """

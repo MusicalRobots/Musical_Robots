@@ -6,15 +6,19 @@ import ast
 import audioread
 import librosa
 import pandas as pd
+import os
 
 from dataset_queries import (
     return_similar_genres,
     return_most_popular_song,
     play_random_song_from_genre,
 )
+
 from svm_prediction import svm_prediction
 from session_state import _get_state
 from typing import List
+
+data_path = os.path.join(os.getcwd(), "musical_robots/data/")
 
 
 class Interactive:
@@ -137,10 +141,14 @@ class Interactive:
 
         """
 
-        file_path_df = pd.read_csv("./data/file_path_df", index_col=0)
-        track_df = pd.read_csv("./data/track_df", index_col=0)
-        genre_df = pd.read_csv("./data/genre_df", index_col=0)
-        total_genre_df = pd.read_csv("./data/total_genre_df", index_col=0)
+        file_path_df = pd.read_csv(os.path.join(data_path, 'file_path_df'),
+                                   index_col=0)
+        track_df = pd.read_csv(os.path.join(data_path, "track_df"),
+                               index_col=0)
+        genre_df = pd.read_csv(os.path.join(data_path, "genre_df"),
+                               index_col=0)
+        total_genre_df = pd.read_csv(os.path.join(data_path, "total_genre_df"),
+                                     index_col=0)
 
         def row_filter(row: pd.Series) -> List[int]:
 
@@ -160,7 +168,8 @@ class Interactive:
         track_df["track_genres"] = track_df.apply(row_filter, axis=1)
 
         st.session_state.genre = svm_prediction(
-            st.session_state.uploaded_filename, genre_df
+            st.session_state.uploaded_filename, genre_df,
+            os.path.join(data_path, "svm_model.pkl")
         )
         st.title("***The genre is  {} !***".format(st.session_state.genre))
         st.markdown(
@@ -269,7 +278,9 @@ class Interactive:
                 "file_path"].str.contains(song_id)]
 
             if len(file_path) != 0:
-                filename = "data/fma_small/" + file_path["file_path"].item()
+                # filename = "data/fma_small/" + file_path["file_path"].item()
+                filename = os.path.join(data_path, "fma_small/"
+                                        + file_path["file_path"].item())
                 st.audio(filename)
                 if st.button("Proceed", key=8) or st_state.proceed_2:
                     st_state.proceed_2 = True
@@ -333,8 +344,9 @@ class Interactive:
                 genre_df=st.session_state.total_genre_df,
                 track_df=st.session_state.track_df,
                 path_df=st.session_state.file_path_df,
+                path_to_data=os.path.join(data_path, "fma_small/")
             )
-            if random_song is not None:
+            if random_song[0] is not None:
                 st.write(
                     "Playing song {} by {} from {} .".format(
                         random_song[1], random_song[2], random_song[3]

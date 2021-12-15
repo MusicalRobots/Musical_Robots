@@ -9,6 +9,7 @@ import unittest
 import pandas as pd
 import numpy as np
 import musical_robots
+
 from musical_robots.spectrogram_dataset import (
     create_dataframes,
     AudioFeature,
@@ -102,7 +103,7 @@ class Tests(unittest.TestCase):
         genre = svm_prediction(
             filename=filename,
             genre_df=self.relevant_genre_df,
-            model_filename="musical_robots/svm_model.pkl",
+            model_filename="musical_robots/data/svm_model.pkl",
         )
         self.assertIsNotNone(genre)
 
@@ -111,7 +112,7 @@ class Tests(unittest.TestCase):
         genre = svm_prediction(
             filename="fake_file",
             genre_df=self.relevant_genre_df,
-            model_filename="musical_robots/svm_model.pkl",
+            model_filename="musical_robots/data/svm_model.pkl",
         )
         self.assertIsNone(genre)
 
@@ -121,7 +122,7 @@ class Tests(unittest.TestCase):
         genre = svm_prediction(
             filename=filename,
             genre_df=self.relevant_genre_df,
-            model_filename="musical_robots/svm_model.pkl",
+            model_filename="musical_robots/data/svm_model.pkl",
         )
         self.assertIsNone(genre)
 
