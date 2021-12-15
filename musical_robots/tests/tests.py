@@ -79,12 +79,15 @@ class Tests(unittest.TestCase):
 
     def test_audio_feature(self):
         """Test making an audio feature object"""
-        AudioFeature(
+        afd = AudioFeature(
             path_to_data=data_path,
             path_df=self.file_path_df,
             music_df=self.track_df,
             genre_df=self.genre_df,
         )
+
+        assert afd.__len__() == 5
+        self.assertIsNotNone(afd.__getitem__(0))
 
     def test_audio_feature_fake_file(self):
         """Test audio feature with fake filepath."""

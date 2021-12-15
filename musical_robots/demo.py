@@ -223,9 +223,9 @@ class Interactive:
             </h4>
             """.format(
                 st.session_state.genre,
-                most_popular_song,
-                most_popular_artist,
-                most_popular_album,
+                ", ".join(most_popular_song),
+                ", ".join(most_popular_artist),
+                ", ".join(most_popular_album),
             ),
             unsafe_allow_html=True,
         )
@@ -363,22 +363,24 @@ class Interactive:
                 return self.end_interaction()
 
 
-if "initialized" not in st.session_state:
-    st.session_state.initialized = True
-    st.session_state.upload_try_time = 1
-    st.session_state.uploaded_filename = None
-    st.session_state_content = None
-    st.session_state.genre = None
-    st.session_state.track_df = None
-    st.session_state.total_genre_df = None
-    st.session_state.most_similar_genres = None
-    st.session_state.file_path_df = None
+if __name__ == '__main__':
+    if "initialized" not in st.session_state:
+        st.session_state.initialized = True
+        st.session_state.upload_try_time = 1
+        st.session_state.uploaded_filename = None
+        st.session_state_content = None
+        st.session_state.genre = None
+        st.session_state.track_df = None
+        st.session_state.total_genre_df = None
+        st.session_state.most_similar_genres = None
+        st.session_state.file_path_df = None
 
-robot = Interactive()
+    robot = Interactive()
 
-if st.session_state.initialized:
-    st_state = _get_state()
-    st.set_page_config(
-        page_title="Musical Robot Cool Web", page_icon="🤖", layout="centered",
-    )
-    robot.start_up()
+    if st.session_state.initialized:
+        st_state = _get_state()
+        st.set_page_config(
+            page_title="Musical Robot Cool Web",
+            page_icon="🤖", layout="centered",
+        )
+        robot.start_up()
