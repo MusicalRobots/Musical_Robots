@@ -12,8 +12,9 @@ A project that helps identify the genre of an mp3 music file and discover music 
 
 ## Repository Structure
 - /docs/: Component specification and functional specification.
-- /musical_robots/data/: Raw data that was used for training the ML model.
-- /musical_robots/Tests/: Unit tests.
+- /musical_robots/data/: Raw data that was used for training the ML model and data containing track and genre information.
+- /musical_robots/tests/: Unit tests.
+- /tutorial_notebooks/: Tutorial notebooks for SVM training and genre prediction.
 
 
 ## Use
