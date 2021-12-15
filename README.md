@@ -21,7 +21,9 @@ A project that helps identify the genre of an mp3 music file and discover music 
 ## Use
 1) Download full repository.
 2) Download the training dataset 'fma_small.zip' and the datasets 'fma_metadata.zip" from https://github.com/mdeff/fma into the data folder. 
-4) To use the service to identify an mp3 music file's genre and explore similar music:
+3) Set up the conda environment with "conda env create -f environment.yml"
+4) Activate the conda environment with "conda activate data-exploration"
+5) To use the service to identify an mp3 music file's genre and explore similar music:
 	- Run the command "streamlit run musical_robots/demo.py" in terminal from the main repository.
 	- The interaction will look as follows.
 <p align="center">
