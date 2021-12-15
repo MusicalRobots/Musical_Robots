@@ -14,6 +14,7 @@ from dataset_queries import (
 )
 from svm_prediction import svm_prediction
 from session_state import _get_state
+from typing import List
 
 
 class Interactive:
@@ -41,7 +42,15 @@ class Interactive:
         Start up the interaction.
 
         """
-        st.title("Hi there. I'm the musical robot. Nice to meet you!")
+        st.markdown(
+            """
+            <h1>
+            Hi there. I'm the musical robot 🤖
+            Nice to meet you!
+            </h1>
+            """,
+            unsafe_allow_html=True,
+        )
         return self.upload_and_save()
 
     def upload_and_save(self):
@@ -50,16 +59,21 @@ class Interactive:
 
         """
         st.write(
-            "If you want to know the genre of the music, please go ahead and "
-            "upload your music/audio file below."
+            """
+            If you want to know the genre of the music, please go ahead and
+            upload your music/audio file below
+            """
         )
-        uploader = st.file_uploader(
+        col1, col2 = st.columns(2)
+        uploader = col1.file_uploader(
             label="", key=st.session_state.upload_try_time,
             accept_multiple_files=False
         )
-
         if uploader is not None or st_state.uploaded:
             st_state.uploaded = True
+            if st_state.uploader_proceed:
+                return self.if_play_songs_first()
+                st.stop()
             st.session_state.uploaded_filename = uploader.name
             st.session_state_content = uploader.getvalue()
             with open("./{}".format(st.session_state.uploaded_filename),
@@ -71,6 +85,7 @@ class Interactive:
                     (y_audio, sample_rate) = librosa.load(
                         st.session_state.uploaded_filename
                     )
+                    st_state.uploader_proceed = True
                     return self.if_play_songs_first()
                 except (RuntimeError, TypeError, audioread.NoBackendError):
                     st.session_state.upload_try_time += 1
@@ -90,25 +105,26 @@ class Interactive:
 
         """
 
-        st.title(
-            "Before analysing the genre, "
-            "do you want to play your audio file?"
+        st.markdown(
+            """
+            <h4>
+            Before analysing the genre,
+            do you want to play your audio file?
+            </h4>
+            """,
+            unsafe_allow_html=True,
         )
-
-        if st.button("Yes", key=1) or st_state.yes_play_audio_first:
+        col2 = st.columns(5)
+        if col2[0].button("Yes", key=1) or st_state.yes_play_audio_first:
             st_state.yes_play_audio_first = True
-            st.write("Gotcha! Gonna play the audio for you! ")
             st.audio(st.session_state_content)
             if st.button("Proceed", key=3) or st_state.proceed_1:
                 st_state.proceed_1 = True
-                st.write("Start analysing...")
                 return self.call_out_genre_prediction()
             else:
                 st.stop()
-        elif st.button("No", key=2) or st_state.no_and_proceed:
-            st_state.no_and_proceed = True
-            st.write("Ok, analysing the genre for you")
-
+        elif col2[1].button("No", key=2) or st_state.no_and_proceed_1:
+            st_state.no_and_proceed_2 = True
             return self.call_out_genre_prediction()
         else:
 
@@ -126,7 +142,7 @@ class Interactive:
         genre_df = pd.read_csv("./data/genre_df", index_col=0)
         total_genre_df = pd.read_csv("./data/total_genre_df", index_col=0)
 
-        def row_filter(row: pd.Series):
+        def row_filter(row: pd.Series) -> List[int]:
 
             """
             Create filter that can be applied to each row of dataframe.
@@ -147,21 +163,26 @@ class Interactive:
             st.session_state.uploaded_filename, genre_df
         )
         st.title("***The genre is  {} !***".format(st.session_state.genre))
-        st.write(
-            "Do you want to know the most popular song in "
-            "{} and similar genres?".format(
+        st.markdown(
+            """
+            <h4>
+            Do you want to know the most popular song in
+            {} and similar genres?
+            </h4>
+             """.format(
                 st.session_state.genre
-            )
+            ),
+            unsafe_allow_html=True,
         )
         st.session_state.file_path_df = file_path_df
         st.session_state.track_df = track_df
         st.session_state.genre_df = genre_df
         st.session_state.total_genre_df = total_genre_df
-
-        if st.button("Yes", key=4) or st_state.yes_similar_songs:
+        col3 = st.columns(5)
+        if col3[0].button("Yes", key=4) or st_state.yes_similar_songs:
             st_state.yes_similar_songs = True
             return self.yes_similar_songs(st.session_state.file_path_df)
-        elif st.button("No", key=5) or st_state.no_and_end_interaction_1:
+        elif col3[1].button("No", key=5) or st_state.no_and_end_interaction_1:
             st_state.no_and_end_interaction_1 = True
             return self.no_similar_songs()
         else:
@@ -185,14 +206,19 @@ class Interactive:
             genre_df=st.session_state.total_genre_df,
             track_df=st.session_state.track_df,
         )
-        st.write(
-            "The most popular songs in the genre {} are "
-            "{} by {} from the albums {}".format(
+        st.markdown(
+            """
+            <h4>
+            The most popular songs in the genre
+            {} are {} by {} from the albums {}.
+            </h4>
+            """.format(
                 st.session_state.genre,
-                ", ".join(most_popular_song),
-                ", ".join(most_popular_artist),
-                ", ".join(most_popular_album),
-            )
+                most_popular_song,
+                most_popular_artist,
+                most_popular_album,
+            ),
+            unsafe_allow_html=True,
         )
 
         st.session_state.most_similar_genres = return_similar_genres(
@@ -201,23 +227,43 @@ class Interactive:
             track_df=st.session_state.track_df,
             k=10,
         )
-        st.write(
-            "The most similar genres to {} are "
-            ": {}".format(st.session_state.genre, ", ".join(
+
+        def ulify(elements: List[str]) -> str:
+            """
+            Create and return a string of unordered list
+            that works in HTML
+            Args:
+                elements: An numpy list
+            Return:
+                (str): a string with HTML unordered list
+                components.
+            """
+            string = "<ul>\n"
+            for s in elements:
+                string += "<li>" + str(s) + "</li>\n"
+            string += "</ul>"
+            return string
+
+        st.markdown(
+            """
+            <h4>The most similar genres to {} are:<br>{}</h4>
+             """.format(
+                st.session_state.genre, ulify(
                     st.session_state.most_similar_genres)
-            )
+            ),
+            unsafe_allow_html=True,
         )
-
-        st.title(
-            "Would you like to hear the most popular song {}".format(
+        st.markdown(
+            """
+            <h4>Would you like to hear the most popular song {} ?</h4>
+            """.format(
                 most_popular_song[0]
-            )
+            ),
+            unsafe_allow_html=True,
         )
-
-        if st.button("Yes", key=6) or st_state.yes_hear_most_popular_song:
+        col4 = st.columns(5)
+        if col4[0].button("Yes", key=6) or st_state.yes_hear_most_popular_song:
             st_state.yes_hear_most_popular_song = True
-            st.write("Gotcha! Gonna playing the most popular song for you! ")
-
             song_id = str(most_popular_song_ids[0]).zfill(6)
             file_path = file_path_df[file_path_df[
                 "file_path"].str.contains(song_id)]
@@ -232,44 +278,52 @@ class Interactive:
                     st.stop()
             else:
                 st.write("Sorry, the audio could not be found!".format())
-        elif st.button("No", key=7) or st_state.no_ask_if_hear_random_song:
-            st_state.no_ask_if_hear_random_song = True
+        elif col4[1].button("No", key=7) or st_state.no_and_proceed_2:
+            st_state.no_and_proceed_2 = True
             return self.ask_if_hear_a_random_song()
         else:
             st.stop()
 
     def ask_if_hear_a_random_song(self):
-        st.write(
-            "Ok, would you like to hear a random song from "
-            "one of the most similar genres: {} ".format(
-                ", ".join(st.session_state.most_similar_genres)
-            )
+        st.markdown(
+            """
+            <h4>
+            Ok, would you like to hear a random song from
+            one of the most similar genres?
+            </h4>
+            """,
+            unsafe_allow_html=True,
         )
 
-        if st.button("Yes") or st_state.yes_play_random_song_from_genre:
+        col5 = st.columns(5)
+        if col5[0].button("Yes") or st_state.yes_play_random_song_from_genre:
             st_state.yes_play_random_song_from_genre = True
             return self.yes_play_random_song_from_genre()
-        elif st.button("No") or st_state.no_and_end_interaction_2:
+        elif col5[1].button("No") or st_state.no_and_end_interaction_2:
             st_state.no_and_end_interaction_2 = True
             return self.end_interaction()
         else:
             st.stop()
 
     def end_interaction(self):
+        st.balloons()
         st.success("Hope this was helpful ! Thank you !")
         st.stop()
         pass
 
     def yes_play_random_song_from_genre(self):
-        st.write(
-            "Which genre would you like to hear a random "
-            "song from: {} ?".format(
-                ", ".join(st.session_state.most_similar_genres)
-            )
+        st.markdown(
+            """
+            <h4>
+            Which genre would you like to hear a random
+            song from ?
+            </h4>
+            """,
+            unsafe_allow_html=True,
         )
-
-        genre = st.selectbox(
-            "genres", ["<select>"] + st.session_state.most_similar_genres, 0
+        col6 = st.columns(2)
+        genre = col6[0].selectbox(
+            "", ["<select>"] + st.session_state.most_similar_genres, 0
         )
         if genre == "<select>":
             st.stop()
@@ -286,12 +340,11 @@ class Interactive:
                         random_song[1], random_song[2], random_song[3]
                     )
                 )
-
-                st.write(random_song[0])
+                play_song = st.empty()
+                play_song.write(random_song[0])
             else:
 
                 st.write("Sorry, could not find a song from this genre.")
-
             if st.button("End interaction",
                          key=10) or st_state.end_interaction_3:
                 st_state.end_interaction_3 = True
@@ -313,4 +366,7 @@ robot = Interactive()
 
 if st.session_state.initialized:
     st_state = _get_state()
+    st.set_page_config(
+        page_title="Musical Robot Cool Web", page_icon="🤖", layout="centered",
+    )
     robot.start_up()
