@@ -143,6 +143,7 @@ class Tests(unittest.TestCase):
                                 pred_labels=np.arange(3))
 
     def test_svm_accuracy_report(self):
+        """Test the accuracy report of the trained SVM."""
         tp_rate, fp_rate, accuracy = \
             svm_accuracy_report(true_labels=[1, 2, 3, 2, 3, 2, 1],
                                 pred_labels=[1, 2, 2, 2, 3, 2, 3])

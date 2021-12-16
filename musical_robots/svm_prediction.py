@@ -92,9 +92,9 @@ def svm_accuracy_report(true_labels: Union[List[int], np.ndarray],
     assert len(true_labels) == len(pred_labels), \
         "True and predicted labels must be the same length. "
 
-    if type(true_labels) is list:
+    if isinstance(true_labels, list):
         true_labels = np.array(true_labels)
-    if type(pred_labels) is list:
+    if isinstance(pred_labels, list):
         pred_labels = np.array(pred_labels)
 
     all_ind = np.arange(len(true_labels))
@@ -117,13 +117,13 @@ def svm_accuracy_report(true_labels: Union[List[int], np.ndarray],
         percentage_ind = (len(
             np.intersect1d(true_ind, pred_ind)) / len(true_ind)) * 100
 
-        fp = len(np.setdiff1d(pred_ind, true_ind))
-        tp = len(np.intersect1d(true_ind, pred_ind))
-        tn = len(np.intersect1d(true_neg, pred_neg))
-        fn = len(np.setdiff1d(pred_neg, true_neg))
+        false_positive = len(np.setdiff1d(pred_ind, true_ind))
+        true_positive = len(np.intersect1d(true_ind, pred_ind))
+        true_negative = len(np.intersect1d(true_neg, pred_neg))
+        false_negative = len(np.setdiff1d(pred_neg, true_neg))
 
-        fp_rate = fp / (fp + tn)
-        tp_rate = tp / (fn + tp)
+        fp_rate = false_positive / (false_positive + true_negative)
+        tp_rate = true_positive / (false_negative + true_positive)
 
         tp_rate_list.append(tp_rate)
         fp_rate_list.append(fp_rate)

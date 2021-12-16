@@ -1,22 +1,21 @@
 """Implementation of interactive class to communicate with user."""
-
-import streamlit as st
 import warnings
 import ast
+from typing import List
+import os
 import audioread
 import librosa
 import pandas as pd
-import os
+import streamlit as st
 
-from dataset_queries import (
+from .dataset_queries import (
     return_similar_genres,
     return_most_popular_song,
     play_random_song_from_genre,
 )
 
-from svm_prediction import svm_prediction
-from session_state import _get_state
-from typing import List
+from .svm_prediction import svm_prediction
+from .session_state import _get_state
 
 data_path = os.path.join(os.getcwd(), "musical_robots/data/")
 
@@ -38,8 +37,6 @@ class Interactive:
         longer wants to listen to similar audio clips.
 
         """
-
-        pass
 
     def start_up(self):
         """
@@ -198,6 +195,7 @@ class Interactive:
             st.stop()
 
     def no_similar_songs(self):
+        """End interaction if user does not want to return similar songs."""
         st.success("Hope this was helpful ! Thank you !")
         st.stop()
         pass
@@ -248,8 +246,8 @@ class Interactive:
                 components.
             """
             string = "<ul>\n"
-            for s in elements:
-                string += "<li>" + str(s) + "</li>\n"
+            for elt in elements:
+                string += "<li>" + str(elt) + "</li>\n"
             string += "</ul>"
             return string
 
@@ -296,6 +294,7 @@ class Interactive:
             st.stop()
 
     def ask_if_hear_a_random_song(self):
+        """Ask the user if they want to hear a random song."""
         st.markdown(
             """
             <h4>
@@ -317,12 +316,14 @@ class Interactive:
             st.stop()
 
     def end_interaction(self):
+        """End the interaction with the UI."""
         st.balloons()
         st.success("Hope this was helpful ! Thank you !")
         st.stop()
         pass
 
     def yes_play_random_song_from_genre(self):
+        """Play a random song from the genre."""
         st.markdown(
             """
             <h4>
