@@ -7,11 +7,11 @@
 </p>
 
 <p align="center">
-A project that helps identify the genre of an mp3 music file and discover music of similar genres.
+A project that helps identify the genre of an mp3 music file and discover music of similar genres.  See the demo at: https://www.youtube.com/watch?v=6ErHy6OuTg4 
 </p>
 
 ## Repository Structure
-- /docs/: Component specification and functional specification.
+- /docs/: Component specification, functional specification, and project presentations.
 - /musical_robots/data/: Raw data that was used for training the ML model and data containing track and genre information.
 - /musical_robots/tests/: Unit tests.
 - /musical_robots/demo.py: Musical Robot User Interaction
